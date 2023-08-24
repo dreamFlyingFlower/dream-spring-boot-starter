@@ -1,0 +1,23 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dream.flying.flower</groupId>
+		<artifactId>dream-parent</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+	<artifactId>dream-spring-boot-starter</artifactId>
+	<packaging>pom</packaging>
+	<name>dream-spring-boot-starter</name>
+	<description>Project for spring boot starter</description>
+
+	<modules>
+		<module>dream-spring-boot-starter-security</module>
+		<module>dream-spring-boot-starter-storage</module>
+		<module>dream-spring-boot-starter-web</module>
+	</modules>
+
+</project>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>dream.flying.flower</groupId>
+		<artifactId>dream-spring-boot-starter</artifactId>
+		<version>0.0.1</version>
+	</parent>
+
+	<artifactId>dream-spring-boot-starter-storage</artifactId>
+	<name>dream-spring-boot-starter-storage</name>
+	<description>Starter project for Storage</description>
+
+	<dependencies>
+		<dependency>
+			<groupId>dream.flying.flower</groupId>
+			<artifactId>dream-framework-storage</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

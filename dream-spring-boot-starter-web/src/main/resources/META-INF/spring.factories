@@ -1,0 +1,6 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+dream.flying.flower.autoconfigure.web.AsyncExecutorAutoConfiguration,\
+dream.flying.flower.autoconfigure.web.CustomizerConfigAutoConfiguration,\
+dream.flying.flower.autoconfigure.web.CustomizerHelperAutoConfiguration,\
+dream.flying.flower.autoconfigure.web.GlobalExceptionAutoConfiguration,\
+dream.flying.flower.autoconfigure.web.SelfWebMvcAutoConfiguration
