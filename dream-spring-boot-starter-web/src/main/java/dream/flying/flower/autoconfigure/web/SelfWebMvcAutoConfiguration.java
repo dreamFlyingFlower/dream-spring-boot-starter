@@ -15,8 +15,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.core.Ordered;
+import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,9 +109,21 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 
 		selfObjectMapper.registerModule(new ParameterNamesModule()).registerModule(new Jdk8Module());
 
+		// 忽略没有的字段
+		// selfObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+		// false)
+		// .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+		// .setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+		// .setSerializationInclusion(JsonInclude.Include.NON_NULL).registerModule(new
+		// ParameterNamesModule())
+		// .registerModule(new Jdk8Module());
+
 		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
 		converter.setObjectMapper(selfObjectMapper);
 		converters.add(converter);
+
+		// 增加图片转换,影响展示图片
+		converters.add(new BufferedImageHttpMessageConverter());
 	}
 
 	private void convertLocalDateTime(ObjectMapper selfObjectMapper) {
@@ -151,5 +167,23 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 			simpleModule.addSerializer(long.class, ToStringSerializer.instance);
 			selfObjectMapper.registerModule(simpleModule);
 		}
+	}
+
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		// 支持swagger2资源库
+		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("doc.html", "swagger-ui.html")
+				.addResourceLocations("classpath:/META-INF/resources/");
+		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/webjars/**")
+				.addResourceLocations("classpath:/META-INF/resources/webjars/");
+		// 第三个资源库支持静态资源访问 前端页面
+		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/static/**")
+				.addResourceLocations("classpath:/static/");
+	}
+
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry.addMapping("/**").allowedOrigins("*").allowCredentials(true).exposedHeaders("X-Auth-Token")
+				.allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS").maxAge(3600);
 	}
 }
