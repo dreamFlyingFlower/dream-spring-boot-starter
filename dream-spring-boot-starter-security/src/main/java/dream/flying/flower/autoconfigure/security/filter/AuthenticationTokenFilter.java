@@ -15,11 +15,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 
 import dream.flying.flower.autoconfigure.security.cache.TokenStoreCache;
 import dream.flying.flower.autoconfigure.security.entity.SecurityUserDetails;
-import dream.flying.flower.autoconfigure.security.helper.TokenHelper;
+import dream.flying.flower.autoconfigure.security.helper.TokenHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,10 +39,10 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
-		String accessToken = TokenHelper.getAccessToken(request);
+		String accessToken = TokenHelpers.getAccessToken(request);
 		log.info("@@@the request url:{}", request.getRequestURI());
 		// accessToken为空,表示未登录,直接放过由SpringSecurity抛出异常
-		if (StrTool.isBlank(accessToken)) {
+		if (StrHelper.isBlank(accessToken)) {
 			chain.doFilter(request, response);
 			return;
 		}

@@ -17,12 +17,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import com.wy.digest.DigestTool;
-import com.wy.lang.StrTool;
+import com.wy.digest.DigestHelper;
+import com.wy.lang.StrHelper;
 import com.wy.result.ResultException;
 
 import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
-import dream.framework.core.json.JsonHelper;
+import dream.framework.core.json.JsonHelpers;
 import dream.framework.web.annotation.Decrypto;
 import lombok.SneakyThrows;
 
@@ -89,26 +89,26 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
 		// 获取数据
 		ServletInputStream inputStream = request.getInputStream();
-		String requestData = JsonHelper.read(inputStream, String.class);
+		String requestData = JsonHelpers.read(inputStream, String.class);
 
-		if (StrTool.isBlank(requestData)) {
+		if (StrHelper.isBlank(requestData)) {
 			throw new ResultException("参数错误");
 		}
 
 		// 解密
 		String decryptText = null;
 		try {
-			decryptText = DigestTool.AESDecrypt(cryptoProperties.getParamSecret(), requestData);
+			decryptText = DigestHelper.AESDecrypt(cryptoProperties.getParamSecret(), requestData);
 		} catch (Exception e) {
 			throw new ResultException("解密失败");
 		}
 
-		if (StrTool.isBlank(decryptText)) {
+		if (StrHelper.isBlank(decryptText)) {
 			throw new ResultException("解密失败");
 		}
 
 		// 获取结果
-		Object result = JsonHelper.read(decryptText, body.getClass());
+		Object result = JsonHelpers.read(decryptText, body.getClass());
 
 		// 返回解密之后的数据
 		return result;

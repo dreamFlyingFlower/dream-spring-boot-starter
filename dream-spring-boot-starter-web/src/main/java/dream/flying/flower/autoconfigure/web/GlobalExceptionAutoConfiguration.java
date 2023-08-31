@@ -24,7 +24,7 @@ import com.wy.enums.TipFormatEnum;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
 
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.WebHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,7 +44,7 @@ public class GlobalExceptionAutoConfiguration {
 
 	@ExceptionHandler(Throwable.class)
 	public Result<?> handleException(Throwable throwable) {
-		log.error(WebHelper.getRequest().getRequestURL().toString(), throwable.getMessage());
+		log.error(WebHelpers.getRequest().getRequestURL().toString(), throwable.getMessage());
 
 		// 接口不存在异常
 		if (throwable instanceof NoHandlerFoundException) {

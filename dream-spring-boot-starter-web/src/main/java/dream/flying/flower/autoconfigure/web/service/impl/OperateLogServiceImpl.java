@@ -28,15 +28,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson2.JSON;
 import com.wy.enums.ResponseEnum;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.logger.BusinessType;
 import com.wy.logger.Logger;
 import com.wy.logger.OperatorType;
 
 import dream.flying.flower.autoconfigure.web.filter.PropertyPreExcludeFilter;
 import dream.framework.web.entity.OperateLog;
-import dream.framework.web.helper.IpHelper;
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.IpHelpers;
+import dream.framework.web.helper.WebHelpers;
 import dream.framework.web.service.OperateLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
@@ -87,9 +87,9 @@ public class OperateLogServiceImpl implements OperateLogService {
 	 * @return OperateLog
 	 */
 	protected OperateLog buildOperateLog(JoinPoint joinPoint) {
-		HttpServletRequest request = WebHelper.getRequest();
-		return OperateLog.builder().beginTime(new Date()).operateIp(IpHelper.getIp(request))
-				.operateUrl(StrTool.substring(request.getRequestURI(), 0, 255))
+		HttpServletRequest request = WebHelpers.getRequest();
+		return OperateLog.builder().beginTime(new Date()).operateIp(IpHelpers.getIp(request))
+				.operateUrl(StrHelper.substring(request.getRequestURI(), 0, 255))
 				.methodName(
 						joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() + "()")
 				.requestMethod(request.getMethod()).build();
@@ -162,7 +162,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 		}
 		// 是否需要保存response,参数和值
 		if (logger.isSaveResponseResult() && Objects.nonNull(result)) {
-			operateLog.setJsonResult(StrTool.substring(JSON.toJSONString(result), 0, 2000));
+			operateLog.setJsonResult(StrHelper.substring(JSON.toJSONString(result), 0, 2000));
 		}
 	}
 
@@ -177,7 +177,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 		String requestMethod = operateLog.getRequestMethod();
 		if (HttpMethod.PUT.name().equals(requestMethod) || HttpMethod.POST.name().equals(requestMethod)) {
 			String params = argsArrayToString(joinPoint.getArgs());
-			operateLog.setOperateParam(StrTool.substring(params, 0, 2000));
+			operateLog.setOperateParam(StrHelper.substring(params, 0, 2000));
 		}
 	}
 
@@ -275,7 +275,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 
 		// 获取参数的信息,传入到数据库中
 		setRequestValue(joinPoint, operateLog);
-		operateLog.setJsonResult(StrTool.substring(JSON.toJSONString(result), 0, 2000));
+		operateLog.setJsonResult(StrHelper.substring(JSON.toJSONString(result), 0, 2000));
 	}
 
 	/**
@@ -299,7 +299,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 				RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
 				Map<String, Object> map = new HashMap<>();
 				String key = parameters[i].getName();
-				if (StrTool.isNotBlank(requestParam.value())) {
+				if (StrHelper.isNotBlank(requestParam.value())) {
 					key = requestParam.value();
 				}
 				map.put(key, args[i]);
@@ -341,7 +341,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 
 		OperateLog operateLog = buildOperateLog(joinPoint);
 		operateLog.setStatus(ResponseEnum.FAIL.ordinal());
-		operateLog.setErrorMsg(StrTool.substring(e.getMessage(), 0, 2000));
+		operateLog.setErrorMsg(StrHelper.substring(e.getMessage(), 0, 2000));
 
 		try {
 			// 处理设置注解上的参数

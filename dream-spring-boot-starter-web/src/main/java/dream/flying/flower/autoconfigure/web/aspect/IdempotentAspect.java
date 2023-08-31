@@ -10,12 +10,12 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import com.wy.idempotent.Idempotence;
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.result.ResultException;
 
 import dream.flying.flower.autoconfigure.web.properties.AopProperties;
 import dream.framework.web.ConstWeb;
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.WebHelpers;
 
 /**
  * 幂等接口切面 FIXME
@@ -42,10 +42,10 @@ public class IdempotentAspect {
 	@Around(value = "idempotent()")
 	public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 		String idempontentHeaderName =
-				StrTool.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE);
+				StrHelper.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE);
 		// 从header中获取幂等编码idempotentCode
-		String idempotentCode = WebHelper.getHeader(idempontentHeaderName);
-		if (StrTool.isBlank(idempotentCode)) {
+		String idempotentCode = WebHelpers.getHeader(idempontentHeaderName);
+		if (StrHelper.isBlank(idempotentCode)) {
 			throw new ResultException("请求头中缺少" + idempontentHeaderName);
 		}
 		// 前置操作幂等编码是否存在
@@ -61,8 +61,8 @@ public class IdempotentAspect {
 	@AfterThrowing(value = "idempotent()", throwing = "e")
 	public void afterThrowing(Throwable e) {
 		// 从header中获取幂等号idempotentCode
-		String idempotentCode = WebHelper.getHeader(
-				StrTool.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE));
+		String idempotentCode = WebHelpers.getHeader(
+				StrHelper.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE));
 		idempotence.record(idempotentCode, 1800L);
 	}
 }

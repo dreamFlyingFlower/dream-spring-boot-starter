@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import com.wy.enums.TipEnum;
 import com.wy.result.Result;
 
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.WebHelpers;
 
 /**
  * Security登录失败
@@ -32,6 +32,6 @@ public class SecurityFailureHandler extends SimpleUrlAuthenticationFailureHandle
 		Result<?> result =
 				Result.builder().code(TipEnum.TIP_INTERNAL_UNAUTHORIZED.getCode()).msg(exception.getMessage()).build();
 		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-		WebHelper.write(response, result);
+		WebHelpers.write(response, result);
 	}
 }

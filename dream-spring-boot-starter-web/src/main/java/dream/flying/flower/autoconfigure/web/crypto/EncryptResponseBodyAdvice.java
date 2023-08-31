@@ -15,8 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.util.ParameterizedTypeImpl;
-import com.wy.digest.DigestTool;
-import com.wy.lang.StrTool;
+import com.wy.digest.DigestHelper;
+import com.wy.lang.StrHelper;
 import com.wy.result.Result;
 import com.wy.result.ResultException;
 
@@ -80,7 +80,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 		String dataText = JSON.toJSONString(data);
 
 		// 如果data为空,直接返回
-		if (StrTool.isBlank(dataText)) {
+		if (StrHelper.isBlank(dataText)) {
 			return body;
 		}
 
@@ -89,7 +89,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 			throw new ResultException("加密失败,数据小于16位");
 		}
 
-		String encryptText = DigestTool.AESEncrypt(cryptoProperties.getParamSecret(), dataText);
+		String encryptText = DigestHelper.AESEncrypt(cryptoProperties.getParamSecret(), dataText);
 		return Result.result(body.getCode(), body.getMsg(), encryptText);
 	}
 }

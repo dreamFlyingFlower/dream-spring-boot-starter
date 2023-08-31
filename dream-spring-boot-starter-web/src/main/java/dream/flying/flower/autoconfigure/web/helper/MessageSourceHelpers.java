@@ -7,7 +7,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
-import com.wy.lang.StrTool;
+import com.wy.lang.StrHelper;
 import com.wy.result.ResultException;
 
 /**
@@ -24,16 +24,16 @@ import com.wy.result.ResultException;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @Component
-public class MessageSourceHelper {
+public class MessageSourceHelpers {
 
 	private static MessageSource messageSource;
 
-	public MessageSourceHelper(MessageSource messageSource) {
-		MessageSourceHelper.messageSource = messageSource;
+	public MessageSourceHelpers(MessageSource messageSource) {
+		MessageSourceHelpers.messageSource = messageSource;
 	}
 
 	private static void assertNull(String msg) {
-		if (StrTool.isBlank(msg)) {
+		if (StrHelper.isBlank(msg)) {
 			throw new ResultException(getMessage("", "提示消息不能为空"));
 		}
 	}

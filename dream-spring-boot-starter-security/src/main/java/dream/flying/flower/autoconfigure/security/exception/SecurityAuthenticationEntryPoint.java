@@ -11,7 +11,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import com.wy.enums.TipEnum;
 import com.wy.result.Result;
 
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.WebHelpers;
 
 /**
  * 匿名用户(token不存在、错误)，异常处理器
@@ -26,6 +26,6 @@ public class SecurityAuthenticationEntryPoint implements AuthenticationEntryPoin
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException {
 		authException.printStackTrace();
-		WebHelper.write(response, Result.error(TipEnum.TIP_AUTH_FAIL));
+		WebHelpers.write(response, Result.error(TipEnum.TIP_AUTH_FAIL));
 	}
 }

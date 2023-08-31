@@ -11,7 +11,7 @@ import dream.flying.flower.autoconfigure.security.entity.SecurityUserDetails;
  * @date 2023-08-09 11:22:40
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-public class SecurityHelper {
+public class SecurityHelpers {
 
 	/**
 	 * 获取用户信息

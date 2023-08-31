@@ -2,8 +2,8 @@ package dream.flying.flower.autoconfigure.security.helper;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.wy.digest.DigestTool;
-import com.wy.lang.StrTool;
+import com.wy.digest.DigestHelper;
+import com.wy.lang.StrHelper;
 
 /**
  * Token 工具类
@@ -12,13 +12,13 @@ import com.wy.lang.StrTool;
  * @date 2023-07-08 17:09:20
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
-public class TokenHelper {
+public class TokenHelpers {
 
 	/**
 	 * 生成 AccessToken
 	 */
 	public static String generator() {
-		return DigestTool.uuid();
+		return DigestHelper.uuid();
 	}
 
 	/**
@@ -26,7 +26,7 @@ public class TokenHelper {
 	 */
 	public static String getAccessToken(HttpServletRequest request) {
 		String accessToken = request.getHeader("Authorization");
-		if (StrTool.isBlank(accessToken)) {
+		if (StrHelper.isBlank(accessToken)) {
 			accessToken = request.getParameter("access_token");
 		}
 

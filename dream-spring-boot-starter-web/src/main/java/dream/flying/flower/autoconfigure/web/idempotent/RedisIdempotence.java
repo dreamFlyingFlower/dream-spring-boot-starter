@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import com.wy.idempotent.Idempotence;
 
-import dream.flying.flower.autoconfigure.web.helper.RedisHelper;
+import dream.flying.flower.autoconfigure.web.helper.RedisHelpers;
 
 /**
  * 使用Redis实现幂等
@@ -21,7 +21,7 @@ import dream.flying.flower.autoconfigure.web.helper.RedisHelper;
 public class RedisIdempotence implements Idempotence {
 
 	@Autowired
-	private RedisHelper redisHelper;
+	private RedisHelpers redisHelper;
 
 	@Override
 	public boolean check(String idempotentCode) {

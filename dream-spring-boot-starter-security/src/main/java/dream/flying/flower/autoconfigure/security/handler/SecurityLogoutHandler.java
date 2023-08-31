@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuc
 
 import com.wy.result.Result;
 
-import dream.framework.web.helper.WebHelper;
+import dream.framework.web.helper.WebHelpers;
 
 /**
  * 登出成功
@@ -27,6 +27,6 @@ public class SecurityLogoutHandler extends SimpleUrlLogoutSuccessHandler {
 	@Override
 	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
 			throws IOException, ServletException {
-		WebHelper.write(response, Result.ok());
+		WebHelpers.write(response, Result.ok());
 	}
 }

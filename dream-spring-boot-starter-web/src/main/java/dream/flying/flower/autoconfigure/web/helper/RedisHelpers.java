@@ -23,12 +23,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.NumberUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.digest.DigestTool;
+import com.wy.digest.DigestHelper;
 
 import dream.flying.flower.autoconfigure.web.config.RedisConfig;
 import dream.framework.core.constant.ConstRedis;
 import dream.framework.core.enums.RedisKey;
-import dream.framework.core.json.FastjsonHelper;
+import dream.framework.core.json.FastjsonHelpers;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Scope("singleton")
 @ConditionalOnBean(value = { RedisTemplate.class }, name = "redisTemplate")
 @Slf4j
-public class RedisHelper {
+public class RedisHelpers {
 
 	@Autowired
 	private RedisTemplate<String, Object> redisTemplate;
@@ -51,8 +51,8 @@ public class RedisHelper {
 	/**
 	 * 原子比较redis集群中的值并删除redis当前key
 	 * 
-	 * @param key key
-	 * @param value value
+	 * @param key key,脚本参数
+	 * @param value value value,脚本值
 	 */
 	public void atomicCompareAndDelete(String key, Object value) {
 		redisTemplate.execute(new DefaultRedisScript<Long>(ConstRedis.SCRIPT_COMPARE_AND_DELETE, Long.class),
@@ -285,7 +285,7 @@ public class RedisHelper {
 	 * @return 执行成功的返回值
 	 */
 	public <T, R> R lock(String key, long timeout, Function<T, R> function, T t) {
-		String uuid = DigestTool.uuid();
+		String uuid = DigestHelper.uuid();
 		// 分布式锁占坑,设置过期时间,必须和加锁一起作为原子性操作
 		Boolean lock = redisTemplate.opsForValue().setIfAbsent(RedisKey.REDIS_KEY_LOCK.getKey(key), uuid,
 				timeout <= 0 ? 100 : timeout, TimeUnit.MILLISECONDS);
@@ -497,7 +497,7 @@ public class RedisHelper {
 	 * @param value value
 	 */
 	public <T> void setJson(String key, T value) {
-		redisTemplate.opsForValue().set(key, FastjsonHelper.toJson(value));
+		redisTemplate.opsForValue().set(key, FastjsonHelpers.toJson(value));
 	}
 
 	/**
@@ -520,7 +520,7 @@ public class RedisHelper {
 	 * @param duration 超时时间
 	 */
 	public <T> void setJsonExpire(String key, Object value, Duration duration) {
-		redisTemplate.opsForValue().set(key, FastjsonHelper.toJson(value), duration);
+		redisTemplate.opsForValue().set(key, FastjsonHelpers.toJson(value), duration);
 	}
 
 	/**
@@ -545,7 +545,7 @@ public class RedisHelper {
 	 * @param timeUnit 超时时间单位
 	 */
 	public <T> void setJsonExpire(String key, T value, long timeout, TimeUnit unit) {
-		redisTemplate.opsForValue().set(key, FastjsonHelper.toJson(value), timeout, unit);
+		redisTemplate.opsForValue().set(key, FastjsonHelpers.toJson(value), timeout, unit);
 	}
 
 	/**
