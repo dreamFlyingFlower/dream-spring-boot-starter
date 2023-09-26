@@ -15,6 +15,7 @@
 	<description>Project for spring boot starter</description>
 
 	<modules>
+		<module>dream-spring-boot-starter-excel</module>
 		<module>dream-spring-boot-starter-security</module>
 		<module>dream-spring-boot-starter-storage</module>
 		<module>dream-spring-boot-starter-web</module>
