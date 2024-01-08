@@ -18,10 +18,10 @@ import com.alibaba.fastjson2.util.ParameterizedTypeImpl;
 import com.wy.digest.DigestHelper;
 import com.wy.lang.StrHelper;
 import com.wy.result.Result;
-import com.wy.result.ResultException;
 
 import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
 import dream.framework.web.annotation.Encrypto;
+import dream.framework.web.entity.BaseRequestEntity;
 
 /**
  * 参数加密
@@ -44,8 +44,6 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
 		ParameterizedTypeImpl genericParameterType = (ParameterizedTypeImpl) returnType.getGenericParameterType();
-
-		// 如果直接是Result,则返回
 		if (genericParameterType.getRawType() == Result.class && returnType.hasMethodAnnotation(Encrypto.class)) {
 			return true;
 		}
@@ -57,7 +55,7 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 		// 如果是ResponseEntity<Result>
 		for (Type type : genericParameterType.getActualTypeArguments()) {
 			if (((ParameterizedTypeImpl) type).getRawType() == Result.class
-			        && returnType.hasMethodAnnotation(Encrypto.class)) {
+					&& returnType.hasMethodAnnotation(Encrypto.class)) {
 				return true;
 			}
 		}
@@ -67,8 +65,8 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 
 	@Override
 	public Result<?> beforeBodyWrite(Result<?> body, MethodParameter returnType, MediaType selectedContentType,
-	        Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
-	        ServerHttpResponse response) {
+			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
+			ServerHttpResponse response) {
 		// 加密
 		Object data = body.getData();
 
@@ -76,20 +74,17 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 		if (data == null) {
 			return body;
 		}
+		// 如果是实体,并且继承了BaseRequestEntity,则放入时间戳
+		if (data instanceof BaseRequestEntity) {
+			((BaseRequestEntity) data).setRequestTime(System.currentTimeMillis());
+		}
 
 		String dataText = JSON.toJSONString(data);
-
-		// 如果data为空,直接返回
 		if (StrHelper.isBlank(dataText)) {
 			return body;
 		}
 
-		// 如果位数小于16,报错
-		if (dataText.length() < 16) {
-			throw new ResultException("加密失败,数据小于16位");
-		}
-
-		String encryptText = DigestHelper.AESEncrypt(cryptoProperties.getParamSecret(), dataText);
-		return Result.result(body.getCode(), body.getMsg(), encryptText);
+		return Result.result(body.getCode(), body.getMsg(),
+				DigestHelper.AESEncrypt(cryptoProperties.getParamSecret(), dataText));
 	}
 }
