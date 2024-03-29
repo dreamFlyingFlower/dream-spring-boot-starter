@@ -14,9 +14,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import com.wy.digest.DigestHelper;
-import com.wy.lang.StrHelper;
-import com.wy.result.ResultException;
+import com.dream.digest.DigestHelper;
+import com.dream.lang.StrHelper;
+import com.dream.result.ResultException;
 
 import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
 import dream.framework.core.json.JsonHelpers;

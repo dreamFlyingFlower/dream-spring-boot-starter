@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.enums.ResponseEnum;
-import com.wy.lang.StrHelper;
-import com.wy.logger.BusinessType;
-import com.wy.logger.Logger;
-import com.wy.logger.OperatorType;
+import com.dream.enums.ResponseEnum;
+import com.dream.lang.StrHelper;
+import com.dream.logger.BusinessType;
+import com.dream.logger.Logger;
+import com.dream.logger.OperatorType;
 
 import dream.flying.flower.autoconfigure.web.filter.PropertyPreExcludeFilter;
 import dream.framework.web.entity.OperateLog;

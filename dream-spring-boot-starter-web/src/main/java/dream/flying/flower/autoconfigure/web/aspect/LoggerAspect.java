@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.wy.logger.Logger;
+import com.dream.logger.Logger;
 
 import dream.framework.web.service.OperateLogService;
 

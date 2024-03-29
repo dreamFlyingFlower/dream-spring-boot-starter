@@ -7,8 +7,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
-import com.wy.lang.StrHelper;
-import com.wy.result.ResultException;
+import com.dream.lang.StrHelper;
+import com.dream.result.ResultException;
 
 /**
  * 国际化配置使用,自动配置类{@link MessageSourceAutoConfiguration},Spring组件中可以直接注入{@link MessageSource}使用

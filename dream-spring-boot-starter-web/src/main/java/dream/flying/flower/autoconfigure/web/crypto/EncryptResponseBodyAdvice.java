@@ -15,9 +15,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.util.ParameterizedTypeImpl;
-import com.wy.digest.DigestHelper;
-import com.wy.lang.StrHelper;
-import com.wy.result.Result;
+import com.dream.digest.DigestHelper;
+import com.dream.lang.StrHelper;
+import com.dream.result.Result;
 
 import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
 import dream.framework.web.annotation.Encrypto;

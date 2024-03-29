@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.NumberUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.digest.DigestHelper;
+import com.dream.digest.DigestHelper;
 
 import dream.framework.core.constant.ConstRedis;
 import dream.framework.core.enums.RedisKey;

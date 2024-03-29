@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import com.wy.idempotent.Idempotence;
-import com.wy.lang.StrHelper;
-import com.wy.result.ResultException;
+import com.dream.idempotent.Idempotence;
+import com.dream.lang.StrHelper;
+import com.dream.result.ResultException;
 
 import dream.flying.flower.autoconfigure.web.properties.AopProperties;
 import dream.framework.web.ConstWeb;

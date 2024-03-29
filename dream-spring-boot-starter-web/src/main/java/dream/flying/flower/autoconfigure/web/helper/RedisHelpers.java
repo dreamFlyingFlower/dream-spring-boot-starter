@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.NumberUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.digest.DigestHelper;
+import com.dream.digest.DigestHelper;
 
 import dream.flying.flower.autoconfigure.web.config.RedisConfig;
 import dream.framework.core.constant.ConstRedis;
