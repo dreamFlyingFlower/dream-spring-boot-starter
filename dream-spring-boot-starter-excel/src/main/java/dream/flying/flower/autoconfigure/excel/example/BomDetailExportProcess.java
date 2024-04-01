@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import com.alibaba.fastjson2.JSON;
-import com.wy.result.ResultException;
+import com.dream.result.ResultException;
 
 import dream.flying.flower.autoconfigure.excel.example.dto.BomDetailDTO;
 import dream.flying.flower.autoconfigure.excel.example.query.BomDetailQuery;

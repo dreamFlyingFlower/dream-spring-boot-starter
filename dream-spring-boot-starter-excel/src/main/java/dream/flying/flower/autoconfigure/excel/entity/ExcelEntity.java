@@ -1,7 +1,7 @@
 package dream.flying.flower.autoconfigure.excel.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.wy.annotation.Unique;
+import com.dream.db.annotation.Unique;
 
 import dream.framework.mybatis.plus.entity.AbstractEntity;
 import lombok.AllArgsConstructor;

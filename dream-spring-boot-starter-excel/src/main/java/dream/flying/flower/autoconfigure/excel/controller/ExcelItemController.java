@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wy.result.Result;
+import com.dream.result.Result;
 
 import dream.flying.flower.autoconfigure.excel.dto.ExcelItemDTO;
 import dream.flying.flower.autoconfigure.excel.entity.ExcelItemEntity;

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wy.result.Result;
-import com.wy.result.ResultException;
+import com.dream.result.Result;
+import com.dream.result.ResultException;
 
 import dream.flying.flower.autoconfigure.excel.dto.ExcelDTO;
 import dream.flying.flower.autoconfigure.excel.entity.ExcelEntity;

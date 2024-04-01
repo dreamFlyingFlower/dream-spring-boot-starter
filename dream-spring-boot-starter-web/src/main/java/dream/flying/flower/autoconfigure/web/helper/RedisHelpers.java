@@ -53,10 +53,11 @@ public class RedisHelpers {
 	 * 
 	 * @param key key,脚本参数
 	 * @param value value value,脚本值
+	 * @return 删除是否成功.true->成功,false->失败
 	 */
-	public void atomicCompareAndDelete(String key, Object value) {
-		redisTemplate.execute(new DefaultRedisScript<Long>(ConstRedis.SCRIPT_COMPARE_AND_DELETE, Long.class),
-				Arrays.asList(key), value);
+	public boolean atomicCompareAndDelete(String key, Object value) {
+		return redisTemplate.execute(new DefaultRedisScript<Long>(ConstRedis.SCRIPT_COMPARE_AND_DELETE, Long.class),
+				Arrays.asList(key), value) > 0;
 	}
 
 	/**
@@ -110,6 +111,16 @@ public class RedisHelpers {
 	 */
 	public Long clearAll() {
 		return redisTemplate.delete(keys());
+	}
+
+	/**
+	 * 删除单个元素
+	 * 
+	 * @param redisKey redis中的key
+	 * @return 删除成功的个数
+	 */
+	public boolean delete(String redisKey) {
+		return redisTemplate.delete(redisKey);
 	}
 
 	/**
