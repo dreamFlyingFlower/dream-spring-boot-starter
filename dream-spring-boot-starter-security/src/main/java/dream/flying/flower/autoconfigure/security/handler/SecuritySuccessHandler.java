@@ -11,8 +11,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
+import com.dream.result.Result;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wy.result.Result;
 
 /**
  * 登录成功的回调

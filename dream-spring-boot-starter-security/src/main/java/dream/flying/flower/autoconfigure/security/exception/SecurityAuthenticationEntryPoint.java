@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import com.wy.enums.TipEnum;
-import com.wy.result.Result;
+import com.dream.enums.TipEnum;
+import com.dream.result.Result;
 
 import dream.framework.web.helper.WebHelpers;
 

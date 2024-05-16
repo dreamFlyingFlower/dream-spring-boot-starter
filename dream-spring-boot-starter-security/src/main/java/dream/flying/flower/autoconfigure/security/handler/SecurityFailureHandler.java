@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
-import com.wy.enums.TipEnum;
-import com.wy.result.Result;
+import com.dream.enums.TipEnum;
+import com.dream.result.Result;
 
 import dream.framework.web.helper.WebHelpers;
 

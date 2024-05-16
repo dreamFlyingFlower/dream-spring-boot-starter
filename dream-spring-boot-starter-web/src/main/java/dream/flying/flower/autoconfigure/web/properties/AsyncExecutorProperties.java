@@ -18,17 +18,19 @@ import lombok.Data;
 @ConfigurationProperties(prefix = "dream.async.executor")
 public class AsyncExecutorProperties {
 
+	private boolean enabled = true;
+
 	/** 配置核心线程数 */
 	private Integer corePoolSize = 10;
 
 	/** 配置最大线程数 */
-	private Integer maxPoolSize = 20;
+	private Integer maxPoolSize = 50;
 
 	/** 配置队列大小 */
-	private Integer queueCapacity = 20;
+	private Integer queueCapacity = 1000;
 
 	/** 配置空闲线程的最大时间,超过该时间,线程将被回收 */
-	private Integer keepAliveSeconds = 60;
+	private Integer keepAliveSeconds = 600;
 
 	/** 配置线程名前缀 */
 	private String threadNamePrefix = "defaultAsyncExecutor_";

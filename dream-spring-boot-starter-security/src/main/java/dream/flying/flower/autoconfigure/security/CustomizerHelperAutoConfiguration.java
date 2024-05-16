@@ -29,7 +29,8 @@ public class CustomizerHelperAutoConfiguration {
 			ClassPathScanningCandidateComponentProvider classPathScanningCandidateComponentProvider =
 					new ClassPathScanningCandidateComponentProvider(true);
 			Set<String> hashSet = new HashSet<>();
-			classPathScanningCandidateComponentProvider.findCandidateComponents("dream.flying.flower.autoconfigure.security.helper")
+			classPathScanningCandidateComponentProvider
+					.findCandidateComponents("dream.flying.flower.autoconfigure.security.helper")
 					.forEach(beanDefinition -> hashSet.add(beanDefinition.getBeanClassName()));
 			return hashSet.toArray(new String[hashSet.size()]);
 		}

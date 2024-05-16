@@ -15,7 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.wy.lang.StrHelper;
+import com.dream.lang.StrHelper;
 
 import dream.flying.flower.autoconfigure.security.cache.TokenStoreCache;
 import dream.flying.flower.autoconfigure.security.entity.SecurityUserDetails;
