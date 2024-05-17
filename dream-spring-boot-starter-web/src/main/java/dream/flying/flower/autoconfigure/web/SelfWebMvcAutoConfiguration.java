@@ -15,12 +15,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.core.Ordered;
 import org.springframework.http.converter.BufferedImageHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.dream.ConstDate;
@@ -37,6 +35,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 
+import dream.flying.flower.autoconfigure.web.config.CorsConfig;
 import dream.flying.flower.autoconfigure.web.properties.SelfWebMvcProperties;
 import dream.framework.web.enums.SerializeLong;
 import dream.framework.web.serial.LongToStringSerializer;
@@ -70,32 +69,23 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 		this.objectMapper = objectMapper;
 	}
 
-	// @Override
-	// public void extendMessageConverters(List<HttpMessageConverter<?>> converters)
-	// {
-	// converters.forEach(converter -> {
-	// if (converter instanceof MappingJackson2HttpMessageConverter) {
-	// ObjectMapper objectMapper = ((MappingJackson2HttpMessageConverter)
-	// converter).getObjectMapper();
-	//
-	// if (dreamWebMvcProperties.getEnableLongToString()) {
-	// convertLongToString(objectMapper);
-	// }
-	// // 时间格式化
-	// objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-	// false);
-	// objectMapper.setDateFormat(new SimpleDateFormat(ConstDate.DATETIME));
-	// // 设置格式化内容
-	// ((MappingJackson2HttpMessageConverter)
-	// converter).setObjectMapper(objectMapper);
-	// }
-	// });
-	// }
-
 	@Override
-	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-		ObjectMapper selfObjectMapper = new ObjectMapper();
+	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+		converters.forEach(converter -> {
+			if (converter instanceof MappingJackson2HttpMessageConverter) {
+				MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter =
+						(MappingJackson2HttpMessageConverter) converter;
+				ObjectMapper objectMapper = mappingJackson2HttpMessageConverter.getObjectMapper();
+				configureMessageConverters(objectMapper);
 
+				mappingJackson2HttpMessageConverter.setObjectMapper(objectMapper);
+			}
+		});
+		// 增加图片转换,影响展示图片
+		converters.add(new BufferedImageHttpMessageConverter());
+	}
+
+	private ObjectMapper configureMessageConverters(ObjectMapper selfObjectMapper) {
 		selfObjectMapper.setConfig(this.objectMapper.getSerializationConfig());
 		selfObjectMapper.setConfig(this.objectMapper.getDeserializationConfig());
 
@@ -118,12 +108,7 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 		// ParameterNamesModule())
 		// .registerModule(new Jdk8Module());
 
-		MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-		converter.setObjectMapper(selfObjectMapper);
-		converters.add(converter);
-
-		// 增加图片转换,影响展示图片
-		converters.add(new BufferedImageHttpMessageConverter());
+		return selfObjectMapper;
 	}
 
 	private void convertLocalDateTime(ObjectMapper selfObjectMapper) {
@@ -149,7 +134,7 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 
 	/**
 	 * 将Long类型转为字符串,long超过9007199254740991L,即2^54-1会在前端js中丢失精度
-	 * 
+	 *
 	 * @param selfObjectMapper
 	 */
 	private void convertLongToString(ObjectMapper selfObjectMapper) {
@@ -169,21 +154,26 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 		}
 	}
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		// 支持swagger2资源库
-		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("doc.html", "swagger-ui.html")
-				.addResourceLocations("classpath:/META-INF/resources/");
-		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/webjars/**")
-				.addResourceLocations("classpath:/META-INF/resources/webjars/");
-		// 第三个资源库支持静态资源访问 前端页面
-		registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/static/**")
-				.addResourceLocations("classpath:/static/");
-	}
+	// @Override
+	// public void addResourceHandlers(ResourceHandlerRegistry registry) {
+	// // 支持swagger2资源库
+	// registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("doc.html", "swagger-ui.html")
+	// .addResourceLocations("classpath:/META-INF/resources/");
+	// registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/webjars/**")
+	// .addResourceLocations("classpath:/META-INF/resources/webjars/");
+	// // 第三个资源库支持静态资源访问 前端页面
+	// registry.setOrder(Ordered.HIGHEST_PRECEDENCE).addResourceHandler("/static/**")
+	// .addResourceLocations("classpath:/static/");
+	// }
 
+	/**
+	 * 可将 {@link CorsConfig}删除,将其中的参数放到当前方法注册
+	 * 
+	 * @param registry
+	 */
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**").allowedOrigins("*").allowCredentials(true).exposedHeaders("X-Auth-Token")
-				.allowedMethods("GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS").maxAge(3600);
+		registry.addMapping("/**").allowedOriginPatterns("*").allowCredentials(true).exposedHeaders("X-Auth-Token")
+				.allowedMethods("*").maxAge(3600);
 	}
 }
