@@ -169,7 +169,9 @@ public class SelfWebMvcAutoConfiguration implements WebMvcConfigurer {
 	/**
 	 * 可将 {@link CorsConfig}删除,将其中的参数放到当前方法注册
 	 * 
-	 * @param registry
+	 * 处理跨域请求,该方法最终会被{@link DefaultCorsProcessor#processRequest}中调用
+	 * 
+	 * @param registry CorsRegistry
 	 */
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
