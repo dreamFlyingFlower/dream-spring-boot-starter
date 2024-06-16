@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.dream.result.ResultException;
 
 import dream.flying.flower.autoconfigure.excel.convert.ExcelConvert;
 import dream.flying.flower.autoconfigure.excel.convert.ExcelItemConvert;
@@ -20,7 +19,8 @@ import dream.flying.flower.autoconfigure.excel.mapper.ExcelMapper;
 import dream.flying.flower.autoconfigure.excel.query.ExcelQuery;
 import dream.flying.flower.autoconfigure.excel.service.ExcelItemService;
 import dream.flying.flower.autoconfigure.excel.service.ExcelService;
-import dream.framework.mybatis.plus.service.impl.AbstractServiceImpl;
+import dream.flying.flower.framework.mybatis.plus.service.impl.AbstractServiceImpl;
+import dream.flying.flower.result.ResultException;
 import lombok.AllArgsConstructor;
 
 /**

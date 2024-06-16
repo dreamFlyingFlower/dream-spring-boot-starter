@@ -13,7 +13,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import dream.framework.web.request.ReusableHttpServletRequestWrapper;
+import dream.flying.flower.framework.web.request.ReusableHttpServletRequestWrapper;
 
 /**
  * 拦截输入流,让输入流可重复使用

@@ -15,13 +15,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.util.ParameterizedTypeImpl;
-import com.dream.digest.DigestHelper;
-import com.dream.lang.StrHelper;
-import com.dream.result.Result;
 
 import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
-import dream.framework.web.annotation.Encrypto;
-import dream.framework.web.entity.BaseRequestEntity;
+import dream.flying.flower.digest.DigestHelper;
+import dream.flying.flower.framework.web.annotation.Encrypto;
+import dream.flying.flower.framework.web.entity.BaseRequestEntity;
+import dream.flying.flower.lang.StrHelper;
+import dream.flying.flower.result.Result;
 
 /**
  * 参数加密

@@ -1,6 +1,6 @@
 package dream.flying.flower.autoconfigure.web.properties;
 
-import dream.framework.web.enums.SerializeLong;
+import dream.flying.flower.framework.web.enums.SerializeLong;
 import lombok.Data;
 
 /**

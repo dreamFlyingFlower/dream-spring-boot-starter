@@ -2,8 +2,8 @@ package dream.flying.flower.autoconfigure.security.helper;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.dream.digest.DigestHelper;
-import com.dream.lang.StrHelper;
+import dream.flying.flower.digest.DigestHelper;
+import dream.flying.flower.lang.StrHelper;
 
 /**
  * Token 工具类

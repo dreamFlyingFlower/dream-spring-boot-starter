@@ -5,9 +5,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import com.dream.idempotent.Idempotence;
-
 import dream.flying.flower.autoconfigure.web.helper.RedisHelpers;
+import dream.flying.flower.idempotent.Idempotence;
 
 /**
  * 使用Redis实现幂等

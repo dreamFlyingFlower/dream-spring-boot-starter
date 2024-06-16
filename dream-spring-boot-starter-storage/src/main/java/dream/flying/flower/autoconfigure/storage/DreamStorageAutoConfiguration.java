@@ -14,12 +14,12 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.Assert;
 
 import dream.flying.flower.autoconfigure.storage.DreamStorageAutoConfiguration.StorageConfigurationImportSelector;
-import dream.framework.storage.StorageManager;
-import dream.framework.storage.StorageManagerCustomizer;
-import dream.framework.storage.StorageManagerCustomizers;
-import dream.framework.storage.config.StorageConfigurations;
-import dream.framework.storage.enums.StorageType;
-import dream.framework.storage.properties.StorageProperties;
+import dream.flying.flower.framework.storage.StorageManager;
+import dream.flying.flower.framework.storage.StorageManagerCustomizer;
+import dream.flying.flower.framework.storage.StorageManagerCustomizers;
+import dream.flying.flower.framework.storage.config.StorageConfigurations;
+import dream.flying.flower.framework.storage.enums.StorageType;
+import dream.flying.flower.framework.storage.properties.StorageProperties;
 
 /**
  * 存储自动配置,参照{@link CacheAutoConfiguration},默认使用本地存储.注意,自动配置不能被直接扫描,否则报错

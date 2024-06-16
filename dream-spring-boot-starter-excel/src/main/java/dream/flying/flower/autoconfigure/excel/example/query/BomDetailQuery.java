@@ -1,6 +1,6 @@
 package dream.flying.flower.autoconfigure.excel.example.query;
 
-import dream.framework.web.query.AbstractQuery;
+import dream.flying.flower.framework.web.query.AbstractQuery;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

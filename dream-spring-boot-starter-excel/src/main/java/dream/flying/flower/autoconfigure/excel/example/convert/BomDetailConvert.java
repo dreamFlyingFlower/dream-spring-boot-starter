@@ -6,7 +6,7 @@ import org.mapstruct.factory.Mappers;
 
 import dream.flying.flower.autoconfigure.excel.example.dto.BomDetailDTO;
 import dream.flying.flower.autoconfigure.excel.example.entity.BomDetailPO;
-import dream.framework.web.convert.BaseConvert;
+import dream.flying.flower.framework.web.convert.BaseConvert;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface BomDetailConvert extends BaseConvert<BomDetailPO, BomDetailDTO> {

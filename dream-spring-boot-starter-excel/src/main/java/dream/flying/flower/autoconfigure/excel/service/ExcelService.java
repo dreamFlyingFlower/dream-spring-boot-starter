@@ -3,7 +3,7 @@ package dream.flying.flower.autoconfigure.excel.service;
 import dream.flying.flower.autoconfigure.excel.dto.ExcelDTO;
 import dream.flying.flower.autoconfigure.excel.entity.ExcelEntity;
 import dream.flying.flower.autoconfigure.excel.query.ExcelQuery;
-import dream.framework.mybatis.plus.service.BaseServices;
+import dream.flying.flower.framework.mybatis.plus.service.BaseServices;
 
 /**
  * 

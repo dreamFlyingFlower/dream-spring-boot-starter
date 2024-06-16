@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 
-import dream.framework.mybatis.plus.entity.AbstractEntity;
+import dream.flying.flower.framework.mybatis.plus.entity.AbstractEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

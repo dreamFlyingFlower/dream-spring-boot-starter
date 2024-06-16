@@ -9,13 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import com.dream.idempotent.Idempotence;
-import com.dream.lang.StrHelper;
-import com.dream.result.ResultException;
-
 import dream.flying.flower.autoconfigure.web.properties.AopProperties;
-import dream.framework.web.ConstWeb;
-import dream.framework.web.helper.WebHelpers;
+import dream.flying.flower.framework.web.ConstWeb;
+import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.idempotent.Idempotence;
+import dream.flying.flower.lang.StrHelper;
+import dream.flying.flower.result.ResultException;
 
 /**
  * 幂等接口切面 FIXME

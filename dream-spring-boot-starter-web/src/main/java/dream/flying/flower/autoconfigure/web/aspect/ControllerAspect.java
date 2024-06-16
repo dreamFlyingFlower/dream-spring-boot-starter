@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import dream.framework.web.service.OperateLogService;
+import dream.flying.flower.framework.web.service.OperateLogService;
 import lombok.extern.slf4j.Slf4j;
 
 /**

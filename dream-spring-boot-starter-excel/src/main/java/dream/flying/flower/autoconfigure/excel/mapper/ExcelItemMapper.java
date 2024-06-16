@@ -3,7 +3,7 @@ package dream.flying.flower.autoconfigure.excel.mapper;
 import dream.flying.flower.autoconfigure.excel.dto.ExcelItemDTO;
 import dream.flying.flower.autoconfigure.excel.entity.ExcelItemEntity;
 import dream.flying.flower.autoconfigure.excel.query.ExcelItemQuery;
-import dream.framework.mybatis.plus.mapper.BaseMappers;
+import dream.flying.flower.framework.mybatis.plus.mapper.BaseMappers;
 
 /**
  * 

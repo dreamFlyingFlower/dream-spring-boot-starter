@@ -8,9 +8,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.dream.logger.Logger;
-
-import dream.framework.web.service.OperateLogService;
+import dream.flying.flower.framework.web.service.OperateLogService;
+import dream.flying.flower.logger.Logger;
 
 /**
  * 日志注解切面拦截器
