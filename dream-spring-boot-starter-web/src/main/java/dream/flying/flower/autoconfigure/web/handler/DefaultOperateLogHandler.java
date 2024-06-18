@@ -1,8 +1,9 @@
-package dream.flying.flower.autoconfigure.web.service.impl;
+package dream.flying.flower.autoconfigure.web.handler;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,14 +27,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.alibaba.fastjson2.JSON;
-
-import dream.flying.flower.autoconfigure.web.filter.PropertyPreExcludeFilter;
 import dream.flying.flower.enums.ResponseEnum;
+import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.web.entity.OperateLog;
+import dream.flying.flower.framework.web.handler.OperateLogHandler;
 import dream.flying.flower.framework.web.helper.IpHelpers;
 import dream.flying.flower.framework.web.helper.WebHelpers;
-import dream.flying.flower.framework.web.service.OperateLogService;
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.logger.BusinessType;
 import dream.flying.flower.logger.Logger;
@@ -51,10 +50,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Async
 @EnableAsync
-public class OperateLogServiceImpl implements OperateLogService {
+public class DefaultOperateLogHandler implements OperateLogHandler {
 
 	/** 排除敏感属性字段 */
-	public static final String[] EXCLUDE_PROPERTIES = { "password", "oldPassword", "newPassword", "confirmPassword" };
+	public static final List<String> EXCLUDE_PROPERTIES =
+			new ArrayList<>(Arrays.asList("password", "oldPassword", "newPassword", "confirmPassword"));
 
 	@Override
 	public Object doAroundLogger(ProceedingJoinPoint joinPoint, Logger logger) {
@@ -162,7 +162,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 		}
 		// 是否需要保存response,参数和值
 		if (logger.isSaveResponseResult() && Objects.nonNull(result)) {
-			operateLog.setJsonResult(StrHelper.substring(JSON.toJSONString(result), 0, 2000));
+			operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toJson(result), 0, 2000));
 		}
 	}
 
@@ -194,7 +194,7 @@ public class OperateLogServiceImpl implements OperateLogService {
 		}
 		for (Object param : params) {
 			if (Objects.nonNull(param) && !isFilterObject(param)) {
-				sb.append(JSON.toJSONString(param, excludePropertyPreFilter()).toString() + " ");
+				sb.append(JsonHelpers.toJson(param, excludeProperties()).toString() + " ");
 			}
 		}
 		return sb.toString().trim();
@@ -230,8 +230,8 @@ public class OperateLogServiceImpl implements OperateLogService {
 	/**
 	 * 忽略敏感属性
 	 */
-	protected PropertyPreExcludeFilter excludePropertyPreFilter() {
-		return new PropertyPreExcludeFilter().addExcludes(EXCLUDE_PROPERTIES);
+	protected List<String> excludeProperties() {
+		return EXCLUDE_PROPERTIES;
 	}
 
 	/**
@@ -268,14 +268,14 @@ public class OperateLogServiceImpl implements OperateLogService {
 			operateLog.setBusinessType(BusinessType.OTHER.ordinal());
 		}
 
-		operateLog.setOperateParam(JSON.toJSONString(getParameter(method, joinPoint.getArgs())));
+		operateLog.setOperateParam(JsonHelpers.toJson(getParameter(method, joinPoint.getArgs())));
 
 		// 设置操作人类别
 		operateLog.setOperateType(OperatorType.OTHER.ordinal());
 
 		// 获取参数的信息,传入到数据库中
 		setRequestValue(joinPoint, operateLog);
-		operateLog.setJsonResult(StrHelper.substring(JSON.toJSONString(result), 0, 2000));
+		operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toJson(result), 0, 2000));
 	}
 
 	/**
@@ -358,6 +358,6 @@ public class OperateLogServiceImpl implements OperateLogService {
 	@Async
 	@Override
 	public void saveOperateLog(OperateLog operateLog) {
-		log.info(JSON.toJSONString(operateLog));
+		log.info(JsonHelpers.toJson(operateLog));
 	}
 }

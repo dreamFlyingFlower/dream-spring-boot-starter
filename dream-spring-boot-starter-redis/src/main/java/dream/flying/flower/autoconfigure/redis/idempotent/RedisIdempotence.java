@@ -1,12 +1,12 @@
-package dream.flying.flower.autoconfigure.web.idempotent;
+package dream.flying.flower.autoconfigure.redis.idempotent;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import dream.flying.flower.autoconfigure.web.helper.RedisHelpers;
+import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
 import dream.flying.flower.idempotent.Idempotence;
+import lombok.AllArgsConstructor;
 
 /**
  * 使用Redis实现幂等
@@ -17,10 +17,10 @@ import dream.flying.flower.idempotent.Idempotence;
  */
 @ConditionalOnBean(value = { RedisTemplate.class }, name = "redisTemplate")
 @Configuration
+@AllArgsConstructor
 public class RedisIdempotence implements Idempotence {
 
-	@Autowired
-	private RedisHelpers redisHelper;
+	private final RedisHelpers redisHelper;
 
 	@Override
 	public boolean check(String idempotentCode) {

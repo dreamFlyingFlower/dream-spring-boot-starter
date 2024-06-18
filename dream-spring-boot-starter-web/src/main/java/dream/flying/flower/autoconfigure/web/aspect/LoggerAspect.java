@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import dream.flying.flower.framework.web.service.OperateLogService;
+import dream.flying.flower.framework.web.handler.OperateLogHandler;
 import dream.flying.flower.logger.Logger;
 
 /**
@@ -23,7 +23,7 @@ import dream.flying.flower.logger.Logger;
 public class LoggerAspect {
 
 	@Autowired
-	private OperateLogService operateLogService;
+	private OperateLogHandler operateLogService;
 
 	/**
 	 * 环绕请求切面

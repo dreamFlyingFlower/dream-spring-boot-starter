@@ -1,4 +1,4 @@
-package dream.flying.flower.autoconfigure.web.helper;
+package dream.flying.flower.autoconfigure.redis.helper;
 
 import java.time.Duration;
 import java.util.Arrays;

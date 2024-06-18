@@ -1,4 +1,4 @@
-package dream.flying.flower.autoconfigure.web.aspect;
+package dream.flying.flower.autoconfigure.redis.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import dream.flying.flower.autoconfigure.web.properties.AopProperties;
+import dream.flying.flower.autoconfigure.redis.properties.AspectProperties;
 import dream.flying.flower.framework.web.ConstWeb;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import dream.flying.flower.idempotent.Idempotence;
@@ -23,7 +23,7 @@ import dream.flying.flower.result.ResultException;
  * @date 2023-01-04 11:05:14
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@EnableConfigurationProperties(AopProperties.class)
+@EnableConfigurationProperties(AspectProperties.class)
 @Component
 @Aspect
 public class IdempotentAspect {
@@ -32,7 +32,7 @@ public class IdempotentAspect {
 	private Idempotence idempotence;
 
 	@Autowired
-	private AopProperties aopProperties;
+	private AspectProperties aspectProperties;
 
 	@Pointcut("@annotation(com.wy.idempotent.annotation.Idempotency)")
 	public void idempotent() {
@@ -41,7 +41,7 @@ public class IdempotentAspect {
 	@Around(value = "idempotent()")
 	public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
 		String idempontentHeaderName =
-				StrHelper.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE);
+				StrHelper.getDefault(aspectProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE);
 		// 从header中获取幂等编码idempotentCode
 		String idempotentCode = WebHelpers.getHeader(idempontentHeaderName);
 		if (StrHelper.isBlank(idempotentCode)) {
@@ -61,7 +61,7 @@ public class IdempotentAspect {
 	public void afterThrowing(Throwable e) {
 		// 从header中获取幂等号idempotentCode
 		String idempotentCode = WebHelpers.getHeader(
-				StrHelper.getDefault(aopProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE));
+				StrHelper.getDefault(aspectProperties.getIdempontentHeaderName(), ConstWeb.HEADER_IDEMPOTENT_CODE));
 		idempotence.record(idempotentCode, 1800L);
 	}
 }

@@ -1,7 +1,9 @@
-package dream.flying.flower.autoconfigure.web.config;
+package dream.flying.flower.autoconfigure.redis.config;
 
 import java.time.Duration;
 
+import org.redisson.spring.starter.RedissonAutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 /**
  * Redis缓存配置
@@ -28,39 +31,46 @@ import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
+@AutoConfiguration(before = RedissonAutoConfiguration.class)
 public class RedisConfig extends CachingConfigurerSupport {
 
 	@Bean
 	@ConditionalOnMissingBean
 	RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-		Jackson2JsonRedisSerializer<Object> jacksonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-		ObjectMapper om = new ObjectMapper();
-		om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-		om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
-		jacksonRedisSerializer.setObjectMapper(om);
+		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
 
 		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
 		redisTemplate.setConnectionFactory(factory);
 		redisTemplate.setKeySerializer(RedisSerializer.string());
-		redisTemplate.setValueSerializer(jacksonRedisSerializer);
+		redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
 
 		redisTemplate.setHashKeySerializer(RedisSerializer.string());
-		redisTemplate.setHashValueSerializer(jacksonRedisSerializer);
+		redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
 		return redisTemplate;
+	}
+
+	private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+		objectMapper.registerModule(new JavaTimeModule());
+
+		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer =
+				new Jackson2JsonRedisSerializer<>(Object.class);
+		jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+		return jackson2JsonRedisSerializer;
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	CacheManager cacheManager(RedisConnectionFactory factory) {
-		Jackson2JsonRedisSerializer<Object> jacksonRedisSerializer = new Jackson2JsonRedisSerializer<>(Object.class);
-		// 解决查询缓存转换异常的问题
-		ObjectMapper om = new ObjectMapper();
-		om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-		jacksonRedisSerializer.setObjectMapper(om);
+		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = jackson2JsonRedisSerializer();
+
 		// 配置序列化,解决乱码的问题,过期时间600秒
 		RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(600))
 				.serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
-				.serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jacksonRedisSerializer))
+				.serializeValuesWith(
+						RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
 				.disableCachingNullValues();
 		return RedisCacheManager.builder(factory).cacheDefaults(config).build();
 	}
