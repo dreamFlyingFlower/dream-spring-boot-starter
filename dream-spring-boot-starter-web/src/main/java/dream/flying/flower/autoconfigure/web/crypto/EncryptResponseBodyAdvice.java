@@ -85,6 +85,6 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> 
 		}
 
 		return Result.result(body.getCode(), body.getMsg(),
-				DigestHelper.AESEncrypt(cryptoProperties.getParamSecret(), dataText));
+				DigestHelper.aesEncrypt(cryptoProperties.getParamSecret(), dataText));
 	}
 }

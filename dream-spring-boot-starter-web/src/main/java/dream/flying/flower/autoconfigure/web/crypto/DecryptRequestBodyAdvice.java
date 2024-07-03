@@ -88,7 +88,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 		// 解密
 		String decryptText = null;
 		try {
-			decryptText = DigestHelper.AESDecrypt(cryptoProperties.getParamSecret(), requestData);
+			decryptText = DigestHelper.aesDecrypt(cryptoProperties.getParamSecret(), requestData);
 		} catch (Exception e) {
 			throw new ResultException("解密失败");
 		}
