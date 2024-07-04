@@ -1,108 +1,100 @@
 package dream.flying.flower.autoconfigure.web.crypto;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.util.List;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import com.alibaba.fastjson2.util.ParameterizedTypeImpl;
-
+import dream.flying.flower.collection.CollectionHelper;
 import dream.flying.flower.digest.DigestHelper;
-import dream.flying.flower.framework.core.annotation.EncryptParam;
+import dream.flying.flower.framework.core.annotation.EncryptResponse;
 import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.web.annotation.SecurityController;
 import dream.flying.flower.framework.web.entity.BaseRequestEntity;
-import dream.flying.flower.framework.web.properties.CryptoProperties;
+import dream.flying.flower.framework.web.properties.EncryptResponseProperties;
 import dream.flying.flower.lang.StrHelper;
-import dream.flying.flower.result.Result;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 参数加密,只能对RequestBody进行处理,只拦截含有SecurityController注解的Controller
- *
+ * 结果加密,只能对{@link ResponseBody}或含有{@link ResponseBody}的注解,同时含有{@link SecurityController}注解的类进行处理
+ * 
+ * 已单独测试完成
+ * 
  * @author 飞花梦影
  * @date 2022-12-20 14:39:46
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @ControllerAdvice(annotations = SecurityController.class)
+@EnableConfigurationProperties(EncryptResponseProperties.class)
 @ConditionalOnMissingClass
-@ConditionalOnProperty(prefix = "dream.crypto", value = "enabled", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "dream.encrypt-response", value = "enabled", matchIfMissing = true)
 @Slf4j
-public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Result<?>> {
+public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-	private final CryptoProperties cryptoProperties;
+	private final EncryptResponseProperties encryptResponseProperties;
 
-	public EncryptResponseBodyAdvice(CryptoProperties cryptoProperties) {
-		this.cryptoProperties = cryptoProperties;
+	public EncryptResponseBodyAdvice(EncryptResponseProperties encryptResponseProperties) {
+		this.encryptResponseProperties = encryptResponseProperties;
 	}
 
 	@Override
 	public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-		// 获得泛型
-		ParameterizedType parameterizedType = (ParameterizedType) returnType.getGenericParameterType();
-
-		// 获得泛型
-		System.out.println(parameterizedType.getActualTypeArguments()[0]);
-
-		// 获得返回类
-		if (returnType.getParameterType() == Result.class && returnType.hasMethodAnnotation(EncryptParam.class)) {
-			return true;
-		}
-
-		if (returnType.getParameterType() != ResponseEntity.class) {
+		Class<?> parameterType = returnType.getParameterType();
+		if (void.class == parameterType || Void.class == parameterType) {
 			return false;
 		}
 
-//		if (genericParameterType.getRawType() != ResponseEntity.class) {
-//			return false;
-//		}
-//
-//		// 如果是ResponseEntity<Result>
-//		for (Type type : genericParameterType.getActualTypeArguments()) {
-//			if (((ParameterizedTypeImpl) type).getRawType() == Result.class
-//					&& returnType.hasMethodAnnotation(EncryptParam.class)) {
-//				return true;
-//			}
-//		}
+		if (!returnType.hasMethodAnnotation(EncryptResponse.class)) {
+			return false;
+		}
 
-		return false;
+		List<Class<?>> encryptClass = encryptResponseProperties.getEncryptClass();
+
+		if (CollectionHelper.isEmpty(encryptClass)) {
+			return true;
+		} else {
+			return encryptClass.stream().anyMatch(t -> t == parameterType);
+		}
 	}
 
 	@Override
-	public Result<?> beforeBodyWrite(Result<?> body, MethodParameter returnType, MediaType selectedContentType,
+	public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType,
 			Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
 			ServerHttpResponse response) {
+		if (body == null) {
+			return body;
+		}
+
 		log.info("@@@加密前数据:{}", JsonHelpers.toJson(body));
 
-		// 只对数据进行加密
-		Object data = body.getData();
-		if (data == null) {
-			return body;
-		}
+		// 获得泛型
+		// ParameterizedType parameterizedType = (ParameterizedType)
+		// returnType.getGenericParameterType();
+		// System.out.println(parameterizedType.getActualTypeArguments()[0]);
 
-		EncryptParam encrypto = returnType.getMethod().getAnnotation(EncryptParam.class);
-		String secretKey = StrHelper.getDefault(encrypto.value(), cryptoProperties.getSecretKey());
+		EncryptResponse encryptResponse = returnType.getMethod().getAnnotation(EncryptResponse.class);
+		String secretKey = StrHelper.getDefault(encryptResponse.value(), encryptResponseProperties.getSecretKey());
 		if (StrHelper.isBlank(secretKey)) {
-			log.error("@@@未配置加密密钥,不进行加密!");
+			log.error("@@@未配置加密密钥,加密失败!");
 			return body;
 		}
 
-		// 如果是实体,并且继承了BaseRequestEntity,则放入时间戳
-		if (data instanceof BaseRequestEntity) {
-			((BaseRequestEntity) data).setRequestTime(System.currentTimeMillis());
+		// FIXME 需要修改为支持多种结果集处理方式
+
+		// 如果继承了BaseRequestEntity,则放入时间戳
+		if (body instanceof BaseRequestEntity) {
+			((BaseRequestEntity) body).setRequestTime(System.currentTimeMillis());
 		}
 
-		String jsonData = JsonHelpers.toJson(data);
-
-		return Result.result(body.getCode(), body.getMsg(), DigestHelper.aesEncrypt(secretKey, jsonData));
+		return DigestHelper.aesEncrypt(secretKey, JsonHelpers.toJson(body));
 	}
 }
