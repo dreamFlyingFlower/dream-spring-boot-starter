@@ -14,29 +14,32 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import dream.flying.flower.autoconfigure.web.properties.CryptoProperties;
 import dream.flying.flower.digest.DigestHelper;
+import dream.flying.flower.framework.core.annotation.DecryptParam;
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.web.annotation.Decrypto;
+import dream.flying.flower.framework.web.annotation.SecurityController;
 import dream.flying.flower.framework.web.entity.BaseRequestEntity;
 import dream.flying.flower.framework.web.helper.WebHelpers;
+import dream.flying.flower.framework.web.properties.CryptoProperties;
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.result.ResultException;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 请求自动解密,只能对RequestBody进行处理,配合Decrypto使用
+ * 请求自动解密,只能对RequestBody进行处理,只拦截含有SecurityController注解的Controller
  *
  * @author 飞花梦影
  * @date 2022-12-20 14:57:47
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@ControllerAdvice
+@ControllerAdvice(annotations = SecurityController.class)
 @ConditionalOnMissingClass
 @ConditionalOnProperty(prefix = "dream.crypto", value = "enabled", matchIfMissing = false)
+@Slf4j
 public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
-	private CryptoProperties cryptoProperties;
+	private final CryptoProperties cryptoProperties;
 
 	public DecryptRequestBodyAdvice(CryptoProperties cryptoProperties) {
 		this.cryptoProperties = cryptoProperties;
@@ -53,7 +56,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 	@Override
 	public boolean supports(MethodParameter methodParameter, Type targetType,
 			Class<? extends HttpMessageConverter<?>> converterType) {
-		return methodParameter.hasMethodAnnotation(Decrypto.class);
+		return methodParameter.getMethod().isAnnotationPresent(DecryptParam.class);
 	}
 
 	@Override
@@ -81,14 +84,22 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 		ServletInputStream inputStream = request.getInputStream();
 		String requestData = JsonHelpers.read(inputStream, String.class);
 
+		log.info("@@@解密前数据:{}", requestData);
 		if (StrHelper.isBlank(requestData)) {
 			throw new ResultException("参数错误");
+		}
+
+		DecryptParam decryptParam = parameter.getMethod().getAnnotation(DecryptParam.class);
+		String secretKey = StrHelper.getDefault(decryptParam.value(), cryptoProperties.getSecretKey());
+		if (StrHelper.isBlank(secretKey)) {
+			log.error("@@@未配置加密密钥,不进行加密!");
+			return body;
 		}
 
 		// 解密
 		String decryptText = null;
 		try {
-			decryptText = DigestHelper.aesDecrypt(cryptoProperties.getParamSecret(), requestData);
+			decryptText = DigestHelper.aesDecrypt(secretKey, requestData);
 		} catch (Exception e) {
 			throw new ResultException("解密失败");
 		}
@@ -120,7 +131,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 	}
 
 	/**
-	 * 如果body为空,转为空对象
+	 * 如果body为空,直接转发
 	 * 
 	 * @param body spring解析完的参数
 	 * @param inputMessage 输入参数
@@ -129,10 +140,9 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 	 * @param converterType 消息转换类型
 	 * @return 真实的参数
 	 */
-	@SneakyThrows
 	@Override
 	public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
 			Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
-		return Class.forName(targetType.getTypeName()).newInstance();
+		return body;
 	}
 }
