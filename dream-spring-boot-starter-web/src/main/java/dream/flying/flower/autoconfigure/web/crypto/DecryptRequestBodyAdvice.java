@@ -12,8 +12,9 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import dream.flying.flower.digest.DigestHelper;
 import dream.flying.flower.framework.core.annotation.DecryptRequest;
+import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.core.strategy.CryptContext;
 import dream.flying.flower.framework.web.annotation.SecurityController;
 import dream.flying.flower.framework.web.properties.DecryptRequestProperties;
 import dream.flying.flower.io.IOHelper;
@@ -83,7 +84,8 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 			return inputMessage;
 		}
 
-		final String decryptData = DigestHelper.aesDecrypt(secretKey, body);
+		final String decryptData =
+				new CryptContext(decryptRequest.cryptType()).decrypt(secretKey, JsonHelpers.toJson(body));
 
 		return new DefaultInputMessage(inputMessage.getHeaders(), IOHelper.toInputStream(decryptData));
 

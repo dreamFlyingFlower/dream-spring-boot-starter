@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import dream.flying.flower.collection.CollectionHelper;
-import dream.flying.flower.digest.DigestHelper;
 import dream.flying.flower.framework.core.annotation.EncryptResponse;
 import dream.flying.flower.framework.core.json.JsonHelpers;
+import dream.flying.flower.framework.core.strategy.CryptContext;
 import dream.flying.flower.framework.web.annotation.SecurityController;
 import dream.flying.flower.framework.web.entity.BaseRequestEntity;
 import dream.flying.flower.framework.web.properties.EncryptResponseProperties;
@@ -95,6 +95,6 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 			((BaseRequestEntity) body).setRequestTime(System.currentTimeMillis());
 		}
 
-		return DigestHelper.aesEncrypt(secretKey, JsonHelpers.toJson(body));
+		return new CryptContext(encryptResponse.cryptType()).encrypt(secretKey, JsonHelpers.toJson(body));
 	}
 }
