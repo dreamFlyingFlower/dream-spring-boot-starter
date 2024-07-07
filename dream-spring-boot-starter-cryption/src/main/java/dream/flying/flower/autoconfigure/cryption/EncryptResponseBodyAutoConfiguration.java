@@ -1,10 +1,12 @@
-package dream.flying.flower.autoconfigure.web.crypto;
+package dream.flying.flower.autoconfigure.cryption;
 
 import java.util.List;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -14,18 +16,19 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import dream.flying.flower.autoconfigure.cryption.annotation.CryptionController;
+import dream.flying.flower.autoconfigure.cryption.annotation.EncryptResponse;
+import dream.flying.flower.autoconfigure.cryption.api.GenerateKey;
+import dream.flying.flower.autoconfigure.cryption.entity.BaseCryption;
+import dream.flying.flower.autoconfigure.cryption.properties.EncryptResponseProperties;
+import dream.flying.flower.autoconfigure.cryption.strategy.CryptContext;
 import dream.flying.flower.collection.CollectionHelper;
-import dream.flying.flower.framework.core.annotation.EncryptResponse;
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.core.strategy.CryptContext;
-import dream.flying.flower.framework.web.annotation.SecurityController;
-import dream.flying.flower.framework.web.entity.BaseRequestEntity;
-import dream.flying.flower.framework.web.properties.EncryptResponseProperties;
 import dream.flying.flower.lang.StrHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 结果加密,只能对{@link ResponseBody}或含有{@link ResponseBody}的注解,同时含有{@link SecurityController}注解的类进行处理
+ * 结果加密,只能对{@link ResponseBody}或含有{@link ResponseBody}的注解,同时含有{@link CryptionController}注解的类进行处理
  * 
  * 已单独测试完成
  * 
@@ -33,16 +36,18 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-12-20 14:39:46
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@ControllerAdvice(annotations = SecurityController.class)
+@Import(GenerateKey.class)
+@AutoConfiguration
+@ControllerAdvice(annotations = CryptionController.class)
 @EnableConfigurationProperties(EncryptResponseProperties.class)
 @ConditionalOnMissingClass
 @ConditionalOnProperty(prefix = "dream.encrypt-response", value = "enabled", matchIfMissing = true)
 @Slf4j
-public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
+public class EncryptResponseBodyAutoConfiguration implements ResponseBodyAdvice<Object> {
 
 	private final EncryptResponseProperties encryptResponseProperties;
 
-	public EncryptResponseBodyAdvice(EncryptResponseProperties encryptResponseProperties) {
+	public EncryptResponseBodyAutoConfiguration(EncryptResponseProperties encryptResponseProperties) {
 		this.encryptResponseProperties = encryptResponseProperties;
 	}
 
@@ -90,9 +95,9 @@ public class EncryptResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
 		// FIXME 需要修改为支持多种结果集处理方式
 
-		// 如果继承了BaseRequestEntity,则放入时间戳
-		if (body instanceof BaseRequestEntity) {
-			((BaseRequestEntity) body).setRequestTime(System.currentTimeMillis());
+		// 如果继承了BaseCryption,则放入时间戳
+		if (body instanceof BaseCryption) {
+			((BaseCryption) body).setRequestTime(System.currentTimeMillis());
 		}
 
 		return new CryptContext(encryptResponse.cryptType()).encrypt(secretKey, JsonHelpers.toJson(body));

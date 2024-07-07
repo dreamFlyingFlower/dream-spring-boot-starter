@@ -1,4 +1,4 @@
-package dream.flying.flower.autoconfigure.web.crypto;
+package dream.flying.flower.autoconfigure.cryption.entity;
 
 import java.io.IOException;
 import java.io.InputStream;

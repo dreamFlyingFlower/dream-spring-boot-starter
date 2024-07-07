@@ -1,8 +1,9 @@
-package dream.flying.flower.autoconfigure.web.crypto;
+package dream.flying.flower.autoconfigure.cryption;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -12,17 +13,18 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice;
 
-import dream.flying.flower.framework.core.annotation.DecryptRequest;
+import dream.flying.flower.autoconfigure.cryption.annotation.DecryptRequest;
+import dream.flying.flower.autoconfigure.cryption.entity.DefaultInputMessage;
+import dream.flying.flower.autoconfigure.cryption.annotation.CryptionController;
+import dream.flying.flower.autoconfigure.cryption.properties.DecryptRequestProperties;
+import dream.flying.flower.autoconfigure.cryption.strategy.CryptContext;
 import dream.flying.flower.framework.core.json.JsonHelpers;
-import dream.flying.flower.framework.core.strategy.CryptContext;
-import dream.flying.flower.framework.web.annotation.SecurityController;
-import dream.flying.flower.framework.web.properties.DecryptRequestProperties;
 import dream.flying.flower.io.IOHelper;
 import dream.flying.flower.lang.StrHelper;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 请求自动解密,只能对RequestBody进行处理,只拦截含有SecurityController注解的Controller
+ * 请求自动解密,只能对RequestBody进行处理,只拦截含有CryptionController注解的Controller
  * 
  * 已单独测试完成
  *
@@ -30,16 +32,17 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-12-20 14:57:47
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@ControllerAdvice(annotations = SecurityController.class)
+@AutoConfiguration
+@ControllerAdvice(annotations = CryptionController.class)
 @EnableConfigurationProperties(DecryptRequestProperties.class)
 @ConditionalOnMissingClass
 @ConditionalOnProperty(prefix = "dream.decrypt-request", value = "enabled", matchIfMissing = true)
 @Slf4j
-public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
+public class DecryptRequestBodyAutoConfiguration implements RequestBodyAdvice {
 
 	private final DecryptRequestProperties decryptRequestProperties;
 
-	public DecryptRequestBodyAdvice(DecryptRequestProperties decryptRequestProperties) {
+	public DecryptRequestBodyAutoConfiguration(DecryptRequestProperties decryptRequestProperties) {
 		this.decryptRequestProperties = decryptRequestProperties;
 	}
 
@@ -89,9 +92,9 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 
 		return new DefaultInputMessage(inputMessage.getHeaders(), IOHelper.toInputStream(decryptData));
 
-		// 强制所有实体类必须继承BaseRequestEntity,设置时间戳
-		// if (result instanceof BaseRequestEntity) {
-		// Long currentTimeMillis = ((BaseRequestEntity) result).getRequestTime();
+		// 强制所有实体类必须继承BaseCryption,设置时间戳
+		// if (result instanceof BaseCryption) {
+		// Long currentTimeMillis = ((BaseCryption) result).getRequestTime();
 		// // 有效期 60秒
 		// long effective = 60 * 1000;
 		//
@@ -105,7 +108,7 @@ public class DecryptRequestBodyAdvice implements RequestBodyAdvice {
 		// } else {
 		// throw new ResultException(
 		// String.format("请求参数类型:%s 未继承:%s", result.getClass().getName(),
-		// BaseRequestEntity.class.getName()));
+		// BaseCryption.class.getName()));
 		// }
 	}
 
