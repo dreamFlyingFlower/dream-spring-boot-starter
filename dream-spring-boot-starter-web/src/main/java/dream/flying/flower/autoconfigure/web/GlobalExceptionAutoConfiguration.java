@@ -1,5 +1,8 @@
 package dream.flying.flower.autoconfigure.web;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -95,6 +98,17 @@ public class GlobalExceptionAutoConfiguration {
 			// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
 			for (FieldError error : ((BindException) throwable).getFieldErrors()) {
 				sb.append("属性:" + error.getField() + "的值" + error.getRejectedValue() + "未通过校验" + ";");
+			}
+			return Result.error(sb.toString());
+		}
+
+		if (throwable instanceof ConstraintViolationException) {
+			StringBuilder sb = new StringBuilder();
+			// 解析原错误信息,封装后返回,此处返回非法的字段名称,原始值,错误信息
+			for (ConstraintViolation<?> constraintViolation : ((ConstraintViolationException) throwable)
+					.getConstraintViolations()) {
+				sb.append("不可用的值[" + constraintViolation.getInvalidValue() + "]:" + constraintViolation.getMessage()
+						+ ";");
 			}
 			return Result.error(sb.toString());
 		}
