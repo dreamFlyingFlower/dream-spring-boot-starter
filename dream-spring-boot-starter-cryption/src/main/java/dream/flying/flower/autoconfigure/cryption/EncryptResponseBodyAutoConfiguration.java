@@ -79,7 +79,7 @@ public class EncryptResponseBodyAutoConfiguration implements ResponseBodyAdvice<
 			return body;
 		}
 
-		log.info("@@@加密前数据:{}", JsonHelpers.toJson(body));
+		log.info("@@@加密前数据:{}", JsonHelpers.toString(body));
 
 		// 获得泛型
 		// ParameterizedType parameterizedType = (ParameterizedType)
@@ -100,6 +100,6 @@ public class EncryptResponseBodyAutoConfiguration implements ResponseBodyAdvice<
 			((BaseCryption) body).setRequestTime(System.currentTimeMillis());
 		}
 
-		return new CryptContext(encryptResponse.cryptType()).encrypt(secretKey, JsonHelpers.toJson(body));
+		return new CryptContext(encryptResponse.cryptType()).encrypt(secretKey, JsonHelpers.toString(body));
 	}
 }

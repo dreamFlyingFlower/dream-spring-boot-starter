@@ -162,7 +162,7 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 		}
 		// 是否需要保存response,参数和值
 		if (logger.isSaveResponseResult() && Objects.nonNull(result)) {
-			operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toJson(result), 0, 2000));
+			operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toString(result), 0, 2000));
 		}
 	}
 
@@ -194,7 +194,7 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 		}
 		for (Object param : params) {
 			if (Objects.nonNull(param) && !isFilterObject(param)) {
-				sb.append(JsonHelpers.toJson(param, excludeProperties()).toString() + " ");
+				sb.append(JsonHelpers.toString(param, excludeProperties()).toString() + " ");
 			}
 		}
 		return sb.toString().trim();
@@ -268,14 +268,14 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 			operateLog.setBusinessType(BusinessType.OTHER.ordinal());
 		}
 
-		operateLog.setOperateParam(JsonHelpers.toJson(getParameter(method, joinPoint.getArgs())));
+		operateLog.setOperateParam(JsonHelpers.toString(getParameter(method, joinPoint.getArgs())));
 
 		// 设置操作人类别
 		operateLog.setOperateType(OperatorType.OTHER.ordinal());
 
 		// 获取参数的信息,传入到数据库中
 		setRequestValue(joinPoint, operateLog);
-		operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toJson(result), 0, 2000));
+		operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toString(result), 0, 2000));
 	}
 
 	/**
@@ -358,6 +358,6 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 	@Async
 	@Override
 	public void saveOperateLog(OperateLog operateLog) {
-		log.info(JsonHelpers.toJson(operateLog));
+		log.info(JsonHelpers.toString(operateLog));
 	}
 }

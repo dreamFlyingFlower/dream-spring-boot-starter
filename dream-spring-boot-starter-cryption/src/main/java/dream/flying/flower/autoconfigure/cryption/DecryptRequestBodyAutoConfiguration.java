@@ -88,7 +88,7 @@ public class DecryptRequestBodyAutoConfiguration implements RequestBodyAdvice {
 		}
 
 		final String decryptData =
-				new CryptContext(decryptRequest.cryptType()).decrypt(secretKey, JsonHelpers.toJson(body));
+				new CryptContext(decryptRequest.cryptType()).decrypt(secretKey, JsonHelpers.toString(body));
 
 		return new DefaultInputMessage(inputMessage.getHeaders(), IOHelper.toInputStream(decryptData));
 
