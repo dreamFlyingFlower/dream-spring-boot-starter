@@ -9,7 +9,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
 import dream.flying.flower.autoconfigure.redis.properties.TokenProperties;
-import dream.flying.flower.framework.web.handler.TokenService;
+import dream.flying.flower.framework.web.handler.TokenHandler;
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.limit.LimitAccessHandler;
 import dream.flying.flower.limit.annotation.LimitAccess;
@@ -30,7 +30,7 @@ public class TokenAccessLimitHandler implements LimitAccessHandler {
 
 	private final RedisHelpers redisHelper;
 
-	private final TokenService tokenService;
+	private final TokenHandler tokenService;
 
 	private final TokenProperties tokenProperties;
 

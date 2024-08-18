@@ -31,14 +31,14 @@ public class RedisSerialCodeHandler implements SerialCodeHandler {
 	private RedisStrHelpers redisStrHelpers;
 
 	@Override
-	public String obtainCode(String prefix, int length) {
+	public String generateCode(String prefix, int length) {
 		Long index = redisStrHelpers.incr(prefix, 1L);
 		DecimalFormat numberFormat = new DecimalFormat(StrHelper.repeat("0", length));
 		return prefix + numberFormat.format(index);
 	}
 
 	@Override
-	public String obtainCodeWithDate(String prefix, int length) {
+	public String generateCodeWithDate(String prefix, int length) {
 		String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String redisKey = ConstRedis.buildKey(prefix, localDate);
 		Long index = redisStrHelpers.incr(redisKey, 1L);
@@ -50,7 +50,7 @@ public class RedisSerialCodeHandler implements SerialCodeHandler {
 	}
 
 	@Override
-	public List<String> obtainCodesWithDate(String prefix, int length, long delta) {
+	public List<String> generateCodesWithDate(String prefix, int length, long delta) {
 		delta = delta < 1 ? 1 : delta;
 		String localDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String redisKey = ConstRedis.buildKey(prefix, localDate);

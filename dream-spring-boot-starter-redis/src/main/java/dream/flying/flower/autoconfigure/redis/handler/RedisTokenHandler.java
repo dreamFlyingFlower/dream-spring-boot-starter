@@ -8,7 +8,7 @@ import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
 import dream.flying.flower.autoconfigure.redis.properties.TokenProperties;
 import dream.flying.flower.digest.DigestHelper;
 import dream.flying.flower.enums.TipEnum;
-import dream.flying.flower.framework.web.handler.TokenService;
+import dream.flying.flower.framework.web.handler.TokenHandler;
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.result.ResultException;
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
  */
 @Service
 @AllArgsConstructor
-public class RedisTokenHandler implements TokenService {
+public class RedisTokenHandler implements TokenHandler {
 
 	private final RedisHelpers redisHelpers;
 
