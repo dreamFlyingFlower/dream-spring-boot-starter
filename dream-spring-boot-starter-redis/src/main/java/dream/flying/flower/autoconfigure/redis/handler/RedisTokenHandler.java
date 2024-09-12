@@ -2,8 +2,6 @@ package dream.flying.flower.autoconfigure.redis.handler;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.stereotype.Service;
-
 import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
 import dream.flying.flower.autoconfigure.redis.properties.TokenProperties;
 import dream.flying.flower.digest.DigestHelper;
@@ -20,7 +18,6 @@ import lombok.AllArgsConstructor;
  * @date 2021-11-09 16:21:50
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Service
 @AllArgsConstructor
 public class RedisTokenHandler implements TokenHandler {
 

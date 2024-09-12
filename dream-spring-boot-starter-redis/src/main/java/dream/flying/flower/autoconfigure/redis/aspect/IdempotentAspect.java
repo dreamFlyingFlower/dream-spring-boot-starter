@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import dream.flying.flower.result.ResultException;
  * @git {@link https://github.com/dreamFlyingFlower }
  */
 @EnableConfigurationProperties(AspectProperties.class)
+@ConditionalOnBean({ Idempotence.class })
 @Component
 @Aspect
 public class IdempotentAspect {
@@ -34,7 +36,7 @@ public class IdempotentAspect {
 	@Autowired
 	private AspectProperties aspectProperties;
 
-	@Pointcut("@annotation(com.wy.idempotent.annotation.Idempotency)")
+	@Pointcut("@annotation(dream.flying.flower.idempotent.annotation.Idempotency)")
 	public void idempotent() {
 	}
 

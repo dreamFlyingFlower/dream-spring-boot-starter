@@ -23,7 +23,7 @@ import dream.flying.flower.lang.StrHelper;
  * @date 2024-03-29 22:30:22
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@ConditionalOnMissingBean
+@ConditionalOnMissingBean(name = "serialCodeHandler")
 @Configuration
 public class RedisSerialCodeHandler implements SerialCodeHandler {
 

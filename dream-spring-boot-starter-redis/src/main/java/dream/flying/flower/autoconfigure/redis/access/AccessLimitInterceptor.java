@@ -36,7 +36,7 @@ import dream.flying.flower.result.Result;
 public class AccessLimitInterceptor implements HandlerInterceptor {
 
 	@Autowired
-	private RedisTemplate<Object, Object> redisTemplate;
+	private RedisTemplate<String, Object> redisTemplate;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)

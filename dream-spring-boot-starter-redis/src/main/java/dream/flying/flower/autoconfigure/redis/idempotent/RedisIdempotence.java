@@ -1,7 +1,7 @@
 package dream.flying.flower.autoconfigure.redis.idempotent;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import dream.flying.flower.autoconfigure.redis.helper.RedisHelpers;
@@ -15,8 +15,8 @@ import lombok.AllArgsConstructor;
  * @date 2023-01-04 10:31:19
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@ConditionalOnMissingBean(Idempotence.class)
 @ConditionalOnBean(value = { RedisTemplate.class }, name = "redisTemplate")
-@Configuration
 @AllArgsConstructor
 public class RedisIdempotence implements Idempotence {
 

@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-06-23 09:43:09
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@AutoConfigureAfter(RedisHelpers.class)
 @Slf4j
 @AllArgsConstructor
 public class TokenAccessLimitHandler implements LimitAccessHandler {
