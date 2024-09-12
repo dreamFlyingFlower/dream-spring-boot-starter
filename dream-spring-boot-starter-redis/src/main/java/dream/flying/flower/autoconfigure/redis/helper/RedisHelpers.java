@@ -168,6 +168,7 @@ public class RedisHelpers {
 	/**
 	 * 获取key指向的list集合中的所有元素
 	 * 
+	 * @param key key
 	 * @return 结果,可能为null
 	 */
 	public List<Object> getList(String key) {
@@ -177,10 +178,24 @@ public class RedisHelpers {
 	/**
 	 * 获取key指向的list集合中下标为index的元素
 	 * 
+	 * @param key key
+	 * @param index 索引
 	 * @return 结果,可能为null
 	 */
 	public Object getList(String key, Long index) {
 		return redisTemplate.opsForList().index(key, index);
+	}
+
+	/**
+	 * 获取key指向的list集合中的从start开始到end结束索引的元素
+	 * 
+	 * @param key key
+	 * @param start 开始索引
+	 * @param end 结束索引
+	 * @return 结果,可能为null
+	 */
+	public List<Object> getList(String key, long start, long end) {
+		return redisTemplate.opsForList().range(key, start, end);
 	}
 
 	/**
@@ -298,8 +313,9 @@ public class RedisHelpers {
 	public <T, R> R lock(String key, long timeout, Function<T, R> function, T t) {
 		String uuid = DigestHelper.uuid();
 		// 分布式锁占坑,设置过期时间,必须和加锁一起作为原子性操作
-		Boolean lock = redisTemplate.opsForValue().setIfAbsent(RedisKey.REDIS_KEY_LOCK.getKey(key), uuid,
-				timeout <= 0 ? 100 : timeout, TimeUnit.MILLISECONDS);
+		Boolean lock = redisTemplate.opsForValue()
+				.setIfAbsent(RedisKey.REDIS_KEY_LOCK.getKey(key), uuid, timeout <= 0 ? 100 : timeout,
+						TimeUnit.MILLISECONDS);
 		if (lock) {
 			try {
 				return function.apply(t);
@@ -406,6 +422,36 @@ public class RedisHelpers {
 	 */
 	public void set(String key, Object value) {
 		redisTemplate.opsForValue().set(key, value);
+	}
+
+	/**
+	 * 给已有的key设置过期时间,默认30分钟
+	 * 
+	 * @param key key
+	 */
+	public void setExpire(String key) {
+		redisTemplate.expire(key, Duration.ofMinutes(ConstRedis.DEFAULT_EXPIRE_TIMEOUT));
+	}
+
+	/**
+	 * 给已有的key设置过期时间
+	 * 
+	 * @param key key
+	 * @param duration 过期时间
+	 */
+	public void setExpire(String key, Duration duration) {
+		redisTemplate.expire(key, duration);
+	}
+
+	/**
+	 * 给已有的key设置过期时间
+	 * 
+	 * @param key key
+	 * @param timeout 过期时间
+	 * @param timeUnit 单位
+	 */
+	public void setExpire(String key, long timeout, TimeUnit timeUnit) {
+		redisTemplate.expire(key, timeout, timeUnit);
 	}
 
 	/**
@@ -625,6 +671,16 @@ public class RedisHelpers {
 	 * @param values values
 	 */
 	public void setListRight(String key, List<Object> values) {
+		redisTemplate.opsForList().rightPushAll(key, values);
+	}
+
+	/**
+	 * 将整个list存入到缓存中,添加到缓存中元素的顺序和原list中序相同,不过期
+	 * 
+	 * @param key key
+	 * @param values values
+	 */
+	public void setListRight(String key, Object... values) {
 		redisTemplate.opsForList().rightPushAll(key, values);
 	}
 

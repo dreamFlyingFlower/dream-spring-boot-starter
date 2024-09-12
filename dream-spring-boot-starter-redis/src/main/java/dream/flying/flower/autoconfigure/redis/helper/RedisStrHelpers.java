@@ -101,6 +101,16 @@ public class RedisStrHelpers {
 	}
 
 	/**
+	 * 删除单个元素
+	 * 
+	 * @param redisKey redis中的key
+	 * @return 删除成功的个数
+	 */
+	public boolean delete(String redisKey) {
+		return stringRedisTemplate.delete(redisKey);
+	}
+
+	/**
 	 * 从list中删除count个元素,从value第一次出现开始
 	 * 
 	 * @param redisKey redis中的key
@@ -145,6 +155,7 @@ public class RedisStrHelpers {
 	/**
 	 * 获取key指向的list集合中的所有元素
 	 * 
+	 * @param key key
 	 * @return 结果,可能为null
 	 */
 	public List<String> getList(String key) {
@@ -154,10 +165,24 @@ public class RedisStrHelpers {
 	/**
 	 * 获取key指向的list集合中下标为index的元素
 	 * 
+	 * @param key key
+	 * @param index 索引
 	 * @return 结果,可能为null
 	 */
 	public String getList(String key, Long index) {
 		return stringRedisTemplate.opsForList().index(key, index);
+	}
+
+	/**
+	 * 获取key指向的list集合中的从start开始到end结束索引的元素
+	 * 
+	 * @param key key
+	 * @param start 开始索引
+	 * @param end 结束索引
+	 * @return 结果,可能为null
+	 */
+	public List<String> getList(String key, long start, long end) {
+		return stringRedisTemplate.opsForList().range(key, start, end);
 	}
 
 	/**
@@ -275,8 +300,9 @@ public class RedisStrHelpers {
 	public <T, R> R lock(String key, long timeout, Function<T, R> function, T t) {
 		String uuid = DigestHelper.uuid();
 		// 分布式锁占坑,设置过期时间,必须和加锁一起作为原子性操作
-		Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent(RedisKey.REDIS_KEY_LOCK.getKey(key), uuid,
-				timeout <= 0 ? 100 : timeout, TimeUnit.MILLISECONDS);
+		Boolean lock = stringRedisTemplate.opsForValue()
+				.setIfAbsent(RedisKey.REDIS_KEY_LOCK.getKey(key), uuid, timeout <= 0 ? 100 : timeout,
+						TimeUnit.MILLISECONDS);
 		if (lock) {
 			try {
 				return function.apply(t);
@@ -387,13 +413,42 @@ public class RedisStrHelpers {
 	}
 
 	/**
+	 * 给已有的key设置过期时间,默认30分钟
+	 * 
+	 * @param key key
+	 */
+	public void setExpire(String key) {
+		stringRedisTemplate.expire(key, Duration.ofMinutes(ConstRedis.DEFAULT_EXPIRE_TIMEOUT));
+	}
+
+	/**
+	 * 给已有的key设置过期时间
+	 * 
+	 * @param key key
+	 * @param duration 过期时间
+	 */
+	public void setExpire(String key, Duration duration) {
+		stringRedisTemplate.expire(key, duration);
+	}
+
+	/**
+	 * 给已有的key设置过期时间
+	 * 
+	 * @param key key
+	 * @param duration 过期时间
+	 */
+	public void setExpire(String key, long timeout, TimeUnit timeUnit) {
+		stringRedisTemplate.expire(key, timeout, timeUnit);
+	}
+
+	/**
 	 * 使用value方式存储缓存,默认过期时间30分钟
 	 * 
 	 * @param key key
 	 * @param value value
 	 */
 	public void setExpire(String key, String value) {
-		setExpire(key, value, 30L);
+		setExpire(key, value, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -603,6 +658,16 @@ public class RedisStrHelpers {
 	 * @param values values
 	 */
 	public void setListRight(String key, List<String> values) {
+		stringRedisTemplate.opsForList().rightPushAll(key, values);
+	}
+
+	/**
+	 * 将整个list存入到缓存中,添加到缓存中元素的顺序和原list中序相同,不过期
+	 * 
+	 * @param key key
+	 * @param values values
+	 */
+	public void setListRight(String key, String... values) {
 		stringRedisTemplate.opsForList().rightPushAll(key, values);
 	}
 
