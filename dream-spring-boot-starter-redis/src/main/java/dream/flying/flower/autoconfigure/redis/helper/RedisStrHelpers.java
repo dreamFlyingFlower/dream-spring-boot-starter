@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * redis缓存中设置和获取值,key的类型全部都是string,若是需要特殊类型的key,使用不带后缀的set和get
  * 用什么opsFor类型存,就必须用该类型取,否则会报错
- * 所有set方法后带out的代表会设置超时时间,默认是30分钟;不带out的都是没有过期时间的,最好是设置超时,避免内存溢出
+ * 所有set方法后带out的代表会设置过期时间,默认是30分钟;不带out的都是没有过期时间的,最好是设置过期时间,避免内存溢出
  * 
  * @auther 飞花梦影
  * @date 2018-07-23 19:50:45
@@ -94,7 +94,7 @@ public class RedisStrHelpers {
 
 	/**
 	 * 清除redis中的所有缓存,若是redis清除某个key时,并没有这个key,返回0
-	 * 无论是用delete或者设置key的超时时间都无法清除key是乱码的数据
+	 * 无论是用delete或者设置key的过期时间都无法清除key是乱码的数据
 	 */
 	public Long clearAll() {
 		return stringRedisTemplate.delete(keys());
@@ -113,24 +113,24 @@ public class RedisStrHelpers {
 	/**
 	 * 从list中删除count个元素,从value第一次出现开始
 	 * 
-	 * @param redisKey redis中的key
+	 * @param key key
 	 * @param count 删除个数
 	 * @param value 删除的元素
 	 * @return 删除成功的个数
 	 */
-	public Long deleteList(String redisKey, Object value, Long count) {
-		return stringRedisTemplate.opsForList().remove(redisKey, count, value);
+	public Long deleteList(String key, Long count, Object value) {
+		return stringRedisTemplate.opsForList().remove(key, count, value);
 	}
 
 	/**
 	 * 删除map中的指定key
 	 * 
-	 * @param redisKey redis中的key
+	 * @param key key
 	 * @param hashKeys hash中的key
 	 * @return 删除成功的个数
 	 */
-	public Long deleteMap(String redisKey, Object... hashKeys) {
-		return stringRedisTemplate.opsForHash().delete(redisKey, hashKeys);
+	public Long deleteMap(String key, Object... hashKeys) {
+		return stringRedisTemplate.opsForHash().delete(key, hashKeys);
 	}
 
 	/**
@@ -418,7 +418,17 @@ public class RedisStrHelpers {
 	 * @param key key
 	 */
 	public void setExpire(String key) {
-		stringRedisTemplate.expire(key, Duration.ofMinutes(ConstRedis.DEFAULT_EXPIRE_TIMEOUT));
+		stringRedisTemplate.expire(key, Duration.ofSeconds(ConstRedis.DEFAULT_EXPIRE_TIMEOUT));
+	}
+
+	/**
+	 * 给已有的key设置过期时间
+	 * 
+	 * @param key key
+	 * @param timeout 过期时间,单位秒
+	 */
+	public void setExpire(String key, long timeout) {
+		stringRedisTemplate.expire(key, Duration.ofSeconds(timeout));
 	}
 
 	/**
@@ -456,7 +466,7 @@ public class RedisStrHelpers {
 	 * 
 	 * @param key key
 	 * @param value value
-	 * @param duration 超时时间
+	 * @param duration 过期时间
 	 */
 	public void setExpire(String key, String value, Duration duration) {
 		stringRedisTemplate.opsForValue().set(key, value, duration);
@@ -467,10 +477,10 @@ public class RedisStrHelpers {
 	 * 
 	 * @param key key
 	 * @param value value
-	 * @param timeout 超时时间,默认单位为分钟
+	 * @param timeout 过期时间,单位秒
 	 */
 	public void setExpire(String key, String value, long timeout) {
-		setExpire(key, value, timeout, TimeUnit.MINUTES);
+		setExpire(key, value, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -478,8 +488,8 @@ public class RedisStrHelpers {
 	 * 
 	 * @param key key
 	 * @param value value
-	 * @param timeout 超时时间
-	 * @param timeUnit 超时时间单位
+	 * @param timeout 过期时间
+	 * @param timeUnit 过期时间单位
 	 */
 	public void setExpire(String key, String value, long timeout, TimeUnit timeUnit) {
 		stringRedisTemplate.opsForValue().set(key, value, timeout, timeUnit);
@@ -493,7 +503,7 @@ public class RedisStrHelpers {
 	 * @return true->成功,false->失败
 	 */
 	public boolean setExpire(RedisOperations<String, ?> redisOperations, String key) {
-		return setExpire(redisOperations, key, 30);
+		return setExpire(redisOperations, key, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -513,11 +523,11 @@ public class RedisStrHelpers {
 	 * 
 	 * @param redisOperations redis处理器
 	 * @param key key
-	 * @param timeout 过期时间
+	 * @param timeout 过期时间,单位秒
 	 * @return true->成功,false->失败
 	 */
 	public boolean setExpire(RedisOperations<String, ?> redisOperations, String key, long timeout) {
-		return setExpire(redisOperations, key, timeout, TimeUnit.MINUTES);
+		return setExpire(redisOperations, key, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -552,7 +562,7 @@ public class RedisStrHelpers {
 	 * @param value value
 	 */
 	public <T> void setJsonExpire(String key, T value) {
-		setJsonExpire(key, value, 30);
+		setJsonExpire(key, value, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -561,7 +571,7 @@ public class RedisStrHelpers {
 	 * @param <T>
 	 * @param key key
 	 * @param value value
-	 * @param duration 超时时间
+	 * @param duration 过期时间
 	 */
 	public <T> void setJsonExpire(String key, T value, Duration duration) {
 		stringRedisTemplate.opsForValue().set(key, FastjsonHelpers.toJson(value), duration);
@@ -573,10 +583,10 @@ public class RedisStrHelpers {
 	 * @param <T>
 	 * @param key key
 	 * @param value value
-	 * @param timeout 超时时间,默认单位分钟
+	 * @param timeout 过期时间,单位秒
 	 */
 	public <T> void setJsonExpire(String key, T value, long timeout) {
-		setJsonExpire(key, value, timeout, TimeUnit.MINUTES);
+		setJsonExpire(key, value, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -585,8 +595,8 @@ public class RedisStrHelpers {
 	 * @param <T>
 	 * @param key key
 	 * @param value value
-	 * @param timeout 超时时间
-	 * @param timeUnit 超时时间单位
+	 * @param timeout 过期时间
+	 * @param timeUnit 过期时间单位
 	 */
 	public <T> void setJsonExpire(String key, T value, long timeout, TimeUnit timeUnit) {
 		stringRedisTemplate.opsForValue().set(key, FastjsonHelpers.toJson(value), timeout, timeUnit);
@@ -624,7 +634,7 @@ public class RedisStrHelpers {
 	 * @param values values
 	 */
 	public void setListLeftExpire(String key, List<String> vals) {
-		setListLeftExpire(key, vals, 30);
+		setListLeftExpire(key, vals, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -632,10 +642,10 @@ public class RedisStrHelpers {
 	 * 
 	 * @param key key
 	 * @param values values
-	 * @param timeout 过期时间
+	 * @param timeout 过期时间,单位秒
 	 */
 	public void setListLeftExpire(String key, List<String> values, long timeout) {
-		setListLeftExpire(key, values, timeout, TimeUnit.MINUTES);
+		setListLeftExpire(key, values, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -678,7 +688,7 @@ public class RedisStrHelpers {
 	 * @param values values
 	 */
 	public void setListRightExpire(String key, List<String> values) {
-		setListRightExpire(key, values, 30);
+		setListRightExpire(key, values, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -686,10 +696,10 @@ public class RedisStrHelpers {
 	 * 
 	 * @param key key
 	 * @param values values
-	 * @param timeout 过期时间
+	 * @param timeout 过期时间,单位秒
 	 */
 	public void setListRightExpire(String key, List<String> values, long timeout) {
-		setListRightExpire(key, values, timeout, TimeUnit.MINUTES);
+		setListRightExpire(key, values, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -733,7 +743,7 @@ public class RedisStrHelpers {
 	 * @param values 一个map对象
 	 */
 	public void setMapExpire(String redisKey, Map<Object, Object> values) {
-		setMapExpire(redisKey, values, 30);
+		setMapExpire(redisKey, values, ConstRedis.DEFAULT_EXPIRE_TIMEOUT);
 	}
 
 	/**
@@ -753,10 +763,10 @@ public class RedisStrHelpers {
 	 * 
 	 * @param redisKey redis中的key值
 	 * @param values 一个map对象
-	 * @param timeout 过期时间,单位分钟
+	 * @param timeout 过期时间,单位秒
 	 */
 	public void setMapExpire(String redisKey, Map<Object, Object> values, long timeout) {
-		setMapExpire(redisKey, values, timeout, TimeUnit.MINUTES);
+		setMapExpire(redisKey, values, timeout, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -764,7 +774,7 @@ public class RedisStrHelpers {
 	 * 
 	 * @param redisKey redis中的key值
 	 * @param values 一个map对象
-	 * @param timeout 过期时间,单位分钟
+	 * @param timeout 过期时间
 	 * @param timeUnit 过期时间单位
 	 */
 	public void setMapExpire(String redisKey, Map<Object, Object> values, long timeout, TimeUnit timeUnit) {
@@ -871,19 +881,19 @@ public class RedisStrHelpers {
 	 * @return 追加成功的个数
 	 */
 	public Long setSetExpire(String key, String... values) {
-		return setSetExpire(key, 30, values);
+		return setSetExpire(key, ConstRedis.DEFAULT_EXPIRE_TIMEOUT, values);
 	}
 
 	/**
-	 * 将数据追加到Set中,并设置过期时间,默认时间单位分钟
+	 * 将数据追加到Set中,并设置过期时间
 	 * 
 	 * @param key key
-	 * @param timeout 过期时间
+	 * @param timeout 过期时间,单位秒
 	 * @param values 追加的值
 	 * @return 追加成功的个数
 	 */
 	public Long setSetExpire(String key, long timeout, String... values) {
-		return setSetExpire(key, timeout, TimeUnit.MINUTES, values);
+		return setSetExpire(key, timeout, TimeUnit.SECONDS, values);
 	}
 
 	/**
@@ -937,11 +947,11 @@ public class RedisStrHelpers {
 	}
 
 	/**
-	 * 当redis中有值时设置,没有值时不设置.默认过期时间单位为秒
+	 * 当redis中有值时设置,没有值时不设置
 	 * 
 	 * @param key key
 	 * @param value value
-	 * @param timeout 过期时间
+	 * @param timeout 过期时间,单位秒
 	 * @return true->redis中有该key,设置成功;false->redis中不存在该key,设置失败
 	 */
 	public boolean setXX(String key, String value, long timeout) {
