@@ -5,7 +5,7 @@
 
 	<parent>
 		<groupId>dream.flying.flower</groupId>
-		<artifactId>dream-parent</artifactId>
+		<artifactId>dream-parent2</artifactId>
 		<version>0.0.1</version>
 	</parent>
 
