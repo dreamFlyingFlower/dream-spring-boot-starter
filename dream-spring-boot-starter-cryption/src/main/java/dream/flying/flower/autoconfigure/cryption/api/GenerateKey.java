@@ -7,7 +7,7 @@ import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
 
-import dream.flying.flower.digest.DigestHelper;
+import dream.flying.flower.digest.RsaHelper;
 import dream.flying.flower.lang.StrHelper;
 
 /**
@@ -27,9 +27,11 @@ public class GenerateKey {
 	 */
 	@Bean
 	RouterFunction<ServerResponse> publicKeyEndpoint(ServerProperties serverProperties) {
-		return RouterFunctions.route().GET(
-				StrHelper.getDefault(serverProperties.getServlet().getContextPath()) + "/generateKey/rsa", request -> {
-					return ServerResponse.ok().body(DigestHelper.rsaGenerateKey());
-				}).build();
+		return RouterFunctions.route()
+				.GET(StrHelper.getDefault(serverProperties.getServlet().getContextPath()) + "/generateKey/rsa",
+						request -> {
+							return ServerResponse.ok().body(RsaHelper.generateKey());
+						})
+				.build();
 	}
 }
