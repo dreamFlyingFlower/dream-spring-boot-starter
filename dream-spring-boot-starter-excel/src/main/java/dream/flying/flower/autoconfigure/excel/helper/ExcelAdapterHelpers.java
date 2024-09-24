@@ -251,7 +251,7 @@ public class ExcelAdapterHelpers {
 			throw new ResultException(
 					"类[" + object.getClass().getSimpleName() + "]不存在映射字段[" + excelItemDTO.getField() + "]");
 		}
-		field.setAccessible(true);
+		ReflectHelper.fixAccessible(field);
 
 		Class<?> fieldType = field.getType();
 		String value = null;
