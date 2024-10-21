@@ -4,10 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.data.redis.core.RedisOperations;
 
 import dream.flying.flower.autoconfigure.redis.CustomizerHelperAutoConfiguration.CustomizerHelperImportSelector;
 
@@ -18,6 +20,7 @@ import dream.flying.flower.autoconfigure.redis.CustomizerHelperAutoConfiguration
  * @date 2023-08-16 15:14:19
  * @git {@link https://gitee.com/dreamFlyingFlower}
  */
+@ConditionalOnClass(RedisOperations.class)
 @AutoConfiguration
 @Import({ CustomizerHelperImportSelector.class })
 public class CustomizerHelperAutoConfiguration {

@@ -39,10 +39,10 @@ import lombok.extern.slf4j.Slf4j;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Component
-@AutoConfigureAfter(RedisConfig.class)
 @Scope("singleton")
-@ConditionalOnBean(value = { RedisTemplate.class }, name = "redisTemplate")
 @Slf4j
+@AutoConfigureAfter(RedisConfig.class)
+@ConditionalOnBean(value = { RedisTemplate.class }, name = "redisTemplate")
 public class RedisHelpers {
 
 	@Autowired
