@@ -20,7 +20,10 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.RedisSerializer;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -58,8 +61,11 @@ public class RedisConfig extends CachingConfigurerSupport {
 
 	private Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer() {
 		ObjectMapper objectMapper = new ObjectMapper();
-		// objectMapper.setVisibility(PropertyAccessor.ALL,
-		// JsonAutoDetect.Visibility.ANY);
+		// 序列化所有字段
+		objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+		// 防止对象中还有对象,出现ClassCastException
+		objectMapper.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(),
+				ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
 		// objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,
 		// ObjectMapper.DefaultTyping.NON_FINAL);
 		// 对象的所有字段全部列入,还是其他的选项,可以忽略null等

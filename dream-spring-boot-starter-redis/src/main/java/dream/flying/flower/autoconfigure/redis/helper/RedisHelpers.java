@@ -29,6 +29,7 @@ import dream.flying.flower.digest.DigestHelper;
 import dream.flying.flower.framework.core.constant.ConstRedis;
 import dream.flying.flower.framework.core.enums.RedisKey;
 import dream.flying.flower.framework.core.json.FastjsonHelpers;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -38,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2018-07-23 19:50:45
  * @git {@link https://github.com/dreamFlyingFlower}
  */
+@Getter
 @Component
 @Scope("singleton")
 @Slf4j
