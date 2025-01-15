@@ -24,6 +24,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import dream.flying.flower.enums.TipEnum;
 import dream.flying.flower.enums.TipFormatEnum;
+import dream.flying.flower.framework.core.constant.ConstConfigPrefix;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import dream.flying.flower.result.Result;
 import dream.flying.flower.result.ResultException;
@@ -36,12 +37,13 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-12-22 11:29:00
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@RestControllerAdvice
-@AutoConfiguration
-@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnProperty(prefix = "dream.global-exception", value = "enabled", matchIfMissing = true)
-@ConditionalOnMissingClass
 @Slf4j
+@AutoConfiguration
+@RestControllerAdvice
+@ConditionalOnMissingClass
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@ConditionalOnProperty(prefix = ConstConfigPrefix.AUTO_GLOBAL_EXCEPTION, value = ConstConfigPrefix.ENABLED,
+		matchIfMissing = true)
 public class GlobalExceptionAutoConfiguration {
 
 	@ExceptionHandler(Throwable.class)
