@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+dream.flying.flower.logger.autoconfigure.OperationLogAutoConfiguration

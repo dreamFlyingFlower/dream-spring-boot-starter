@@ -17,6 +17,7 @@
 	<modules>
 		<module>dream-spring-boot-starter-cryption</module>
 		<module>dream-spring-boot-starter-excel</module>
+		<module>dream-spring-boot-starter-logger</module>
 		<module>dream-spring-boot-starter-redis</module>
 		<module>dream-spring-boot-starter-security</module>
 		<module>dream-spring-boot-starter-storage</module>
