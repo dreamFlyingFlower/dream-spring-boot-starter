@@ -1,5 +1,7 @@
 package dream.flying.flower.logger.autoconfigure;
 
+import java.io.IOException;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -8,8 +10,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.zalando.logbook.Correlation;
 import org.zalando.logbook.HttpLogWriter;
+import org.zalando.logbook.HttpRequest;
+import org.zalando.logbook.HttpResponse;
 import org.zalando.logbook.Logbook;
+import org.zalando.logbook.Precorrelation;
+import org.zalando.logbook.Sink;
 import org.zalando.logbook.json.JsonHttpLogFormatter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,6 +76,25 @@ public class OperationLogAutoConfiguration {
 	@ConditionalOnMissingBean(Logbook.class)
 	@ConditionalOnBean(HttpLogWriter.class)
 	public Logbook logbook(ObjectMapper objectMapper, HttpLogWriter writer) {
-		return Logbook.builder().writer(writer).formatter(new JsonHttpLogFormatter(objectMapper)).build();
+		return Logbook.builder().sink(new Sink() {
+
+			@Override
+			public void write(Correlation correlation, HttpRequest request, HttpResponse response) throws IOException {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void write(Precorrelation precorrelation, HttpRequest request) throws IOException {
+				// TODO Auto-generated method stub
+
+			}
+		}).build();
+
+		// return Logbook.builder().writer(writer).formatter(new
+		// JsonHttpLogFormatter(objectMapper)).build();
+
+		// return Logbook.builder().writer(writer).formatter(new
+		// JsonHttpLogFormatter(objectMapper)).build();
 	}
 }
