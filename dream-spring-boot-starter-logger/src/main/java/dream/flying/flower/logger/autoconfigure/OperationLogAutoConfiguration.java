@@ -38,10 +38,10 @@ import dream.flying.flower.logger.repository.OperationLogRepository;
  * @since 1.0.0
  */
 @Configuration
+@Import(AsyncConfig.class)
+@MapperScan("com.dream.logger.mapper")
 @EnableConfigurationProperties(LoggerProperties.class)
 @ConditionalOnProperty(prefix = "dream.logger", name = "enabled", havingValue = "true", matchIfMissing = true)
-@MapperScan("com.dream.logger.mapper")
-@Import(AsyncConfig.class)
 public class OperationLogAutoConfiguration {
 
 	@Bean
