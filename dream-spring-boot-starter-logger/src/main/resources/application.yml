@@ -1,0 +1,3 @@
+logbook:
+  write:
+    max-body-size: 10

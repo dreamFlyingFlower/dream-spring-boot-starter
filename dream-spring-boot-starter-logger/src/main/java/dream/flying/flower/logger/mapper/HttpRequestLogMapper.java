@@ -10,9 +10,9 @@ import dream.flying.flower.logger.entity.HttpRequestLog;
  * HTTP请求日志Mapper接口
  *
  * @author 飞花梦影
- * @date 2024-01-06 15:30:45
- * @since 1.0.0
+ * @date 2025-03-18 22:41:35
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Mapper
 public interface HttpRequestLogMapper extends BaseMapper<HttpRequestLog> {
-} 
+}

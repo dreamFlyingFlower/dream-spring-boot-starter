@@ -2,8 +2,8 @@ package dream.flying.flower.logger.logbook;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
+import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.zalando.logbook.Correlation;
 import org.zalando.logbook.HttpRequest;
@@ -14,6 +14,7 @@ import org.zalando.logbook.Sink;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dream.flying.flower.framework.core.helper.IpHelpers;
+import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.logger.entity.HttpRequestLog;
 import dream.flying.flower.logger.mapper.HttpRequestLogMapper;
 import dream.flying.flower.logger.properties.LoggerProperties;
@@ -21,15 +22,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 数据库HTTP日志记录器 将HTTP请求响应日志保存到数据库中
+ * 将HTTP请求响应日志保存到数据库中
  *
  * @author 飞花梦影
- * @date 2024-01-06 15:30:45
- * @since 1.0.0
+ * @date 2025-03-18 22:41:17
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
 @RequiredArgsConstructor
-public class DatabaseHttpLogWriter implements Sink {
+public class DatabaseSink implements Sink {
 
 	private final HttpRequestLogMapper logMapper;
 
@@ -39,7 +40,7 @@ public class DatabaseHttpLogWriter implements Sink {
 
 	@Override
 	public void write(Precorrelation precorrelation, HttpRequest request) throws IOException {
-
+		MDC.putCloseable("traceId", precorrelation.getId());
 	}
 
 	@Async("operationLogExecutor")
@@ -47,7 +48,7 @@ public class DatabaseHttpLogWriter implements Sink {
 	public void write(Correlation correlation, HttpRequest request, HttpResponse response) throws IOException {
 		try {
 			HttpRequestLog logEntity = HttpRequestLog.builder()
-					.traceId(UUID.randomUUID().toString())
+					.traceId(correlation.getId())
 					.appName(properties.getAppName())
 					.requestTime(LocalDateTime.now())
 					.responseTime(LocalDateTime.now())
@@ -59,7 +60,7 @@ public class DatabaseHttpLogWriter implements Sink {
 					.responseStatus(response.getStatus())
 					.responseHeaders(objectMapper.writeValueAsString(response.getHeaders()))
 					.responseBody(response.getBodyAsString())
-					.clientIp(IpHelpers.getIp(request))
+					.clientIp(getIp(request))
 					.createdTime(LocalDateTime.now())
 					.build();
 
@@ -67,5 +68,52 @@ public class DatabaseHttpLogWriter implements Sink {
 		} catch (Exception e) {
 			log.error("Failed to save HTTP request log", e);
 		}
+	}
+
+	/**
+	 * 获取客户端IP
+	 * 
+	 * @param request 请求对象
+	 * @return IP地址
+	 */
+	public static String getIp(HttpRequest request) {
+		if (request == null) {
+			return "unknown";
+		}
+		// 如果通过了多级反向代理,X-Forwarded-For的值并不止一个,而是一串IP值.取第一个非unknown的有效IP字符串
+		String ip = request.getHeaders().getFirst("x-forwarded-for");
+		if (!checkIp(ip)) {
+			ip = ip.split(",")[0];
+		}
+		// apache http请求可能会有该值
+		if (checkIp(ip)) {
+			ip = request.getHeaders().getFirst("Proxy-Client-IP");
+		}
+		// weblogic请求可能会有该值
+		if (checkIp(ip)) {
+			ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
+		}
+		// 某些代理可能会有该值
+		if (checkIp(ip)) {
+			ip = request.getHeaders().getFirst("HTTP_CLIENT_IP");
+		}
+		// nginx可能会该值
+		if (checkIp(ip)) {
+			ip = request.getHeaders().getFirst("X-Real-IP");
+		}
+		if (checkIp(ip)) {
+			ip = request.getRemote();
+		}
+		return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : IpHelpers.getMultistageReverseProxyIp(ip);
+	}
+
+	/**
+	 * 检测给定字符串是否为未知,多用于检测HTTP请求相关
+	 *
+	 * @param checkString 被检测的字符串
+	 * @return 是否未知
+	 */
+	private static boolean checkIp(String ip) {
+		return StrHelper.isBlank(ip) || "unknown".equalsIgnoreCase(ip);
 	}
 }

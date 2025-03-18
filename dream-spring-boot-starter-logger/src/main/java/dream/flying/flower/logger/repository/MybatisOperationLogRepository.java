@@ -6,16 +6,13 @@ import dream.flying.flower.logger.entity.OperationLog;
 import dream.flying.flower.logger.mapper.OperationLogMapper;
 import dream.flying.flower.logger.model.OperationLogModel;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 操作日志MyBatis存储实现类 实现日志的持久化存储，使用MyBatis-Plus进行数据库操作
  *
  * @author 飞花梦影
  * @date 2024-01-06 15:30:45
- * @since 1.0.0
  */
-@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MybatisOperationLogRepository implements OperationLogRepository {
@@ -52,6 +49,6 @@ public class MybatisOperationLogRepository implements OperationLogRepository {
 
 	@Override
 	public void checkAndCreateTable() {
-		// 使用Flyway，不需要手动创建表
+		// 使用Flyway,不需要手动创建表
 	}
 }

@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dream.flying.flower.framework.core.helper.IpHelpers;
 import dream.flying.flower.logger.Logger;
 import dream.flying.flower.logger.model.OperationLogModel;
 import dream.flying.flower.logger.properties.LoggerProperties;
@@ -26,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
  * 操作日志切面类 实现AOP切面，拦截带有@OperationLog注解的方法 记录方法的调用信息，包括请求参数、响应结果、执行时间等
  *
  * @author 飞花梦影
- * @date 2024-01-06 15:30:45
- * @since 1.0.0
+ * @date 2025-03-18 22:40:20
+ * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Slf4j
 @Aspect
@@ -94,7 +95,7 @@ public class OperationLogAspect {
 					.success(success)
 					.errorMsg(errorMsg)
 					.costTime(costTime)
-					.clientIp(getClientIp(request))
+					.clientIp(IpHelpers.getIp(request))
 					.userId(getCurrentUserId())
 					.username(getCurrentUsername())
 					.createdTime(LocalDateTime.now())
@@ -104,20 +105,6 @@ public class OperationLogAspect {
 		} catch (Exception e) {
 			log.error("Failed to save operation log", e);
 		}
-	}
-
-	private String getClientIp(HttpServletRequest request) {
-		String ip = request.getHeader("X-Forwarded-For");
-		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("Proxy-Client-IP");
-		}
-		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getHeader("WL-Proxy-Client-IP");
-		}
-		if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-			ip = request.getRemoteAddr();
-		}
-		return ip;
 	}
 
 	// 这里需要根据实际项目获取当前用户信息
