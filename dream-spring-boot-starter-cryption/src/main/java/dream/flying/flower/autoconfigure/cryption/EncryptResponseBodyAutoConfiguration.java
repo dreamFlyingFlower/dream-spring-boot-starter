@@ -36,13 +36,13 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-12-20 14:39:46
  * @git {@link https://github.com/dreamFlyingFlower }
  */
-@Import(GenerateKey.class)
+@Slf4j
 @AutoConfiguration
+@ConditionalOnMissingClass
+@Import(GenerateKey.class)
 @ControllerAdvice(annotations = CryptionController.class)
 @EnableConfigurationProperties(EncryptResponseProperties.class)
-@ConditionalOnMissingClass
 @ConditionalOnProperty(prefix = "dream.encrypt-response", value = "enabled", matchIfMissing = true)
-@Slf4j
 public class EncryptResponseBodyAutoConfiguration implements ResponseBodyAdvice<Object> {
 
 	private final EncryptResponseProperties encryptResponseProperties;

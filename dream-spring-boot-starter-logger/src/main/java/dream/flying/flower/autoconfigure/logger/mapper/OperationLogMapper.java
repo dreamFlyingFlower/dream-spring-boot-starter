@@ -1,10 +1,10 @@
-package dream.flying.flower.logger.mapper;
+package dream.flying.flower.autoconfigure.logger.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import dream.flying.flower.logger.entity.OperationLog;
+import dream.flying.flower.autoconfigure.logger.entity.OperationLogEntity;
 
 /**
  * 操作日志Mapper接口,继承MyBatis-Plus的BaseMapper,提供基础的CRUD操作
@@ -14,5 +14,5 @@ import dream.flying.flower.logger.entity.OperationLog;
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Mapper
-public interface OperationLogMapper extends BaseMapper<OperationLog> {
+public interface OperationLogMapper extends BaseMapper<OperationLogEntity> {
 }

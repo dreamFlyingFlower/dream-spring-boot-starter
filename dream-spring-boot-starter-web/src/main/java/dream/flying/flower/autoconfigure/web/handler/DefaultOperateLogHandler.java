@@ -28,10 +28,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import dream.flying.flower.enums.ResponseEnum;
+import dream.flying.flower.framework.core.helper.IpHelpers;
 import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.web.entity.OperateLog;
 import dream.flying.flower.framework.web.handler.OperateLogHandler;
-import dream.flying.flower.framework.web.helper.IpHelpers;
 import dream.flying.flower.framework.web.helper.WebHelpers;
 import dream.flying.flower.lang.StrHelper;
 import dream.flying.flower.logger.BusinessType;
@@ -88,11 +88,14 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 	 */
 	protected OperateLog buildOperateLog(JoinPoint joinPoint) {
 		HttpServletRequest request = WebHelpers.getRequest();
-		return OperateLog.builder().beginTime(new Date()).operateIp(IpHelpers.getIp(request))
+		return OperateLog.builder()
+				.beginTime(new Date())
+				.operateIp(IpHelpers.getIp(request))
 				.operateUrl(StrHelper.substring(request.getRequestURI(), 0, 255))
 				.methodName(
 						joinPoint.getTarget().getClass().getName() + "." + joinPoint.getSignature().getName() + "()")
-				.requestMethod(request.getMethod()).build();
+				.requestMethod(request.getMethod())
+				.build();
 	}
 
 	/**
@@ -156,12 +159,12 @@ public class DefaultOperateLogHandler implements OperateLogHandler {
 		// 设置操作人类别
 		operateLog.setOperateType(logger.operatorType().ordinal());
 		// 是否需要保存request,参数和值
-		if (logger.isSaveRequestParams()) {
+		if (logger.saveRequest()) {
 			// 获取参数的信息,传入到数据库中
 			setRequestValue(joinPoint, operateLog);
 		}
 		// 是否需要保存response,参数和值
-		if (logger.isSaveResponseResult() && Objects.nonNull(result)) {
+		if (logger.saveResponse() && Objects.nonNull(result)) {
 			operateLog.setJsonResult(StrHelper.substring(JsonHelpers.toString(result), 0, 2000));
 		}
 	}

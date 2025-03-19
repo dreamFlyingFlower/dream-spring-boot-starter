@@ -1,4 +1,4 @@
-package dream.flying.flower.logger.config;
+package dream.flying.flower.autoconfigure.logger.config;
 
 import java.util.concurrent.Executor;
 
@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import dream.flying.flower.logger.properties.LoggerProperties;
+import dream.flying.flower.autoconfigure.logger.properties.LoggerProperties;
 import lombok.RequiredArgsConstructor;
 
 /**

@@ -1,4 +1,4 @@
-package dream.flying.flower.logger.logbook;
+package dream.flying.flower.autoconfigure.logger.logbook;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -11,13 +11,12 @@ import org.zalando.logbook.HttpResponse;
 import org.zalando.logbook.Precorrelation;
 import org.zalando.logbook.Sink;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import dream.flying.flower.autoconfigure.logger.entity.OperationLogEntity;
+import dream.flying.flower.autoconfigure.logger.properties.LoggerProperties;
+import dream.flying.flower.autoconfigure.logger.service.OperationLogService;
 import dream.flying.flower.framework.core.helper.IpHelpers;
+import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.lang.StrHelper;
-import dream.flying.flower.logger.entity.HttpRequestLog;
-import dream.flying.flower.logger.mapper.HttpRequestLogMapper;
-import dream.flying.flower.logger.properties.LoggerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,11 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DatabaseSink implements Sink {
 
-	private final HttpRequestLogMapper logMapper;
+	private final OperationLogService operationLogService;
 
 	private final LoggerProperties properties;
-
-	private final ObjectMapper objectMapper;
 
 	@Override
 	public void write(Precorrelation precorrelation, HttpRequest request) throws IOException {
@@ -47,7 +44,7 @@ public class DatabaseSink implements Sink {
 	@Override
 	public void write(Correlation correlation, HttpRequest request, HttpResponse response) throws IOException {
 		try {
-			HttpRequestLog logEntity = HttpRequestLog.builder()
+			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(correlation.getId())
 					.appName(properties.getAppName())
 					.requestTime(LocalDateTime.now())
@@ -55,16 +52,16 @@ public class DatabaseSink implements Sink {
 					.costTime(correlation.getDuration().toMillis())
 					.requestMethod(request.getMethod())
 					.requestUrl(request.getPath())
-					.requestHeaders(objectMapper.writeValueAsString(request.getHeaders()))
+					.requestHeaders(JsonHelpers.toString(request.getHeaders()))
 					.requestBody(request.getBodyAsString())
 					.responseStatus(response.getStatus())
-					.responseHeaders(objectMapper.writeValueAsString(response.getHeaders()))
+					.responseHeaders(JsonHelpers.toString(response.getHeaders()))
 					.responseBody(response.getBodyAsString())
 					.clientIp(getIp(request))
 					.createdTime(LocalDateTime.now())
 					.build();
 
-			logMapper.insert(logEntity);
+			operationLogService.save(operationLogEntity);
 		} catch (Exception e) {
 			log.error("Failed to save HTTP request log", e);
 		}

@@ -1,4 +1,4 @@
-package dream.flying.flower.logger.aspect;
+package dream.flying.flower.autoconfigure.logger.aspect;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,13 +13,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import dream.flying.flower.autoconfigure.logger.entity.OperationLogEntity;
+import dream.flying.flower.autoconfigure.logger.properties.LoggerProperties;
+import dream.flying.flower.autoconfigure.logger.service.OperationLogService;
 import dream.flying.flower.framework.core.helper.IpHelpers;
+import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.logger.Logger;
-import dream.flying.flower.logger.model.OperationLogModel;
-import dream.flying.flower.logger.properties.LoggerProperties;
-import dream.flying.flower.logger.repository.OperationLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,11 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class OperationLogAspect {
 
-	private final OperationLogRepository logRepository;
+	private final OperationLogService operationLogService;
 
 	private final LoggerProperties properties;
-
-	private final ObjectMapper objectMapper;
 
 	@Around("@annotation(logger)")
 	public Object around(ProceedingJoinPoint point, Logger logger) throws Throwable {
@@ -77,7 +74,7 @@ public class OperationLogAspect {
 
 			MethodSignature signature = (MethodSignature) point.getSignature();
 
-			OperationLogModel logModel = OperationLogModel.builder()
+			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(UUID.randomUUID().toString())
 					.appName(properties.getAppName())
 					.module(logger.value())
@@ -88,11 +85,10 @@ public class OperationLogAspect {
 					.packageName(point.getTarget().getClass().getPackage().getName())
 					.requestMethod(request.getMethod())
 					.requestUrl(request.getRequestURI())
-					.requestParams(logger.saveRequest() ? objectMapper.writeValueAsString(point.getArgs()) : null)
-					.requestBody(
-							logger.saveRequest() ? objectMapper.writeValueAsString(request.getParameterMap()) : null)
-					.responseBody(logger.saveResponse() ? objectMapper.writeValueAsString(result) : null)
-					.success(success)
+					.requestParams(logger.saveRequest() ? JsonHelpers.toString(point.getArgs()) : null)
+					.requestBody(logger.saveRequest() ? JsonHelpers.toString(request.getParameterMap()) : null)
+					.responseBody(logger.saveResponse() ? JsonHelpers.toString(result) : null)
+					.success(success ? 1 : 0)
 					.errorMsg(errorMsg)
 					.costTime(costTime)
 					.clientIp(IpHelpers.getIp(request))
@@ -101,7 +97,7 @@ public class OperationLogAspect {
 					.createdTime(LocalDateTime.now())
 					.build();
 
-			logRepository.save(logModel);
+			operationLogService.save(operationLogEntity);
 		} catch (Exception e) {
 			log.error("Failed to save operation log", e);
 		}

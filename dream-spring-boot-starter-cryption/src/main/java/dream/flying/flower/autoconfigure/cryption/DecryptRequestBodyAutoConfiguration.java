@@ -32,12 +32,12 @@ import lombok.extern.slf4j.Slf4j;
  * @date 2022-12-20 14:57:47
  * @git {@link https://github.com/dreamFlyingFlower }
  */
+@Slf4j
 @AutoConfiguration
+@ConditionalOnMissingClass
 @ControllerAdvice(annotations = CryptionController.class)
 @EnableConfigurationProperties(DecryptRequestProperties.class)
-@ConditionalOnMissingClass
 @ConditionalOnProperty(prefix = "dream.decrypt-request", value = "enabled", matchIfMissing = true)
-@Slf4j
 public class DecryptRequestBodyAutoConfiguration implements RequestBodyAdvice {
 
 	private final DecryptRequestProperties decryptRequestProperties;

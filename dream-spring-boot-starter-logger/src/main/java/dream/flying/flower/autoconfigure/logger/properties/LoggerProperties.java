@@ -1,4 +1,4 @@
-package dream.flying.flower.logger.properties;
+package dream.flying.flower.autoconfigure.logger.properties;
 
 import java.util.ArrayList;
 import java.util.List;

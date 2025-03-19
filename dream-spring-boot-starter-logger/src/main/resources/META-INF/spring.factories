@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-dream.flying.flower.logger.autoconfigure.OperationLogAutoConfiguration
+dream.flying.flower.autoconfigure.logger.OperationLogAutoConfiguration

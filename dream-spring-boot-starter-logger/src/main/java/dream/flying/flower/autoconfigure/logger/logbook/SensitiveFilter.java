@@ -1,4 +1,4 @@
-package dream.flying.flower.logger.logbook;
+package dream.flying.flower.autoconfigure.logger.logbook;
 
 import java.util.regex.Pattern;
 
