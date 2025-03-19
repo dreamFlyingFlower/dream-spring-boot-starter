@@ -21,6 +21,7 @@
 
 * dream-spring-boot-starter-cryption:加密相关自动配置
 * dream-spring-boot-starter-excel:excel相关自动配置
+* dream-spring-boot-starter-logger:日志相关自动配置
 * dream-spring-boot-starter-redis:redis相关自动配置
 * dream-spring-boot-starter-security:安全相关自动配置
 * dream-spring-boot-starter-storage:存储相关自动配置
@@ -145,6 +146,30 @@
 
 
 # excel
+
+# logger
+
+
+
+* 在application.yml中必须配置如下
+
+  ```yml
+  logging:
+    level:
+    	# 根据实际情况选择日志级别
+      '[org.zalando.logbook]': trace
+      # 可选
+      '[org.flywaydb]': debug
+  
+  spring:
+    flyway:
+      # 如果使用mysql数据库,首次迁移时基线化非空数据库
+      baseline-on-migrate: true
+      # 清除所有表,生产必须使用true
+      clean-disabled: true
+  ```
+
+* 自动迁移的sql脚本版本必须大于1,否则无法自动建表
 
 
 

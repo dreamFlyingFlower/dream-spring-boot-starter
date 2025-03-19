@@ -40,9 +40,18 @@ public class DatabaseSink implements Sink {
 		MDC.putCloseable("traceId", precorrelation.getId());
 	}
 
-	@Async("operationLogExecutor")
+	/**
+	 * 直接使用异步注解会有问题
+	 * 
+	 * @param correlation
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 */
+	// @Async("operationLogExecutor")
 	@Override
 	public void write(Correlation correlation, HttpRequest request, HttpResponse response) throws IOException {
+
 		try {
 			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(correlation.getId())

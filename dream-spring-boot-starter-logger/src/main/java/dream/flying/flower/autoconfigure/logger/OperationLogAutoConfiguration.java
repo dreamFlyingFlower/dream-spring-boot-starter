@@ -1,19 +1,16 @@
 package dream.flying.flower.autoconfigure.logger;
 
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.zalando.logbook.Logbook;
 import org.zalando.logbook.Sink;
 import org.zalando.logbook.autoconfigure.LogbookAutoConfiguration;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import dream.flying.flower.autoconfigure.logger.aspect.OperationLogAspect;
 import dream.flying.flower.autoconfigure.logger.config.AsyncConfig;
@@ -30,8 +27,9 @@ import dream.flying.flower.autoconfigure.logger.service.impl.OperationLogService
  * @git {@link https://github.com/dreamFlyingFlower}
  */
 @Configuration
+@AutoConfiguration
 @Import(AsyncConfig.class)
-@AutoConfigureAfter(LogbookAutoConfiguration.class)
+@AutoConfigureBefore(LogbookAutoConfiguration.class)
 @EnableConfigurationProperties(LoggerProperties.class)
 @MapperScan("dream.flying.flower.autoconfigure.logger.mapper")
 @ConditionalOnProperty(prefix = "dream.logger", name = "enabled", havingValue = "true", matchIfMissing = true)
@@ -39,13 +37,13 @@ public class OperationLogAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(OperationLogService.class)
-	public OperationLogService operationLogService() {
+	OperationLogService operationLogService() {
 		return new OperationLogServiceImpl();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(OperationLogAspect.class)
-	public OperationLogAspect operationLogAspect(OperationLogService operationLogService, LoggerProperties properties) {
+	OperationLogAspect operationLogAspect(OperationLogService operationLogService, LoggerProperties properties) {
 		return new OperationLogAspect(operationLogService, properties);
 	}
 
@@ -53,14 +51,7 @@ public class OperationLogAutoConfiguration {
 	@ConditionalOnMissingBean(DatabaseSink.class)
 	@ConditionalOnProperty(prefix = "dream.logger", name = "http-log.enabled", havingValue = "true",
 			matchIfMissing = true)
-	public Sink databaseSink(OperationLogService operationLogService, LoggerProperties properties) {
+	Sink sink(OperationLogService operationLogService, LoggerProperties properties) {
 		return new DatabaseSink(operationLogService, properties);
-	}
-
-	@Bean
-	@ConditionalOnBean(DatabaseSink.class)
-	@ConditionalOnMissingBean(Logbook.class)
-	public Logbook logbook(ObjectMapper objectMapper, DatabaseSink databaseSink) {
-		return Logbook.builder().sink(databaseSink).build();
 	}
 }
