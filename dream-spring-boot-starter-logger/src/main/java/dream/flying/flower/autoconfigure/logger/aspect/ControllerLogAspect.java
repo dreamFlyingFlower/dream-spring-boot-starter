@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.CodeSignature;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -24,29 +25,25 @@ import dream.flying.flower.autoconfigure.logger.service.OperationLogService;
 import dream.flying.flower.framework.core.helper.IpHelpers;
 import dream.flying.flower.framework.core.json.JsonHelpers;
 import dream.flying.flower.framework.web.helper.WebHelpers;
-import dream.flying.flower.logger.Logger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * 操作日志切面类 实现AOP切面,拦截带有@Logger注解的方法 记录方法的调用信息,包括请求参数、响应结果、执行时间等
- *
- * @author 飞花梦影
- * @date 2025-03-18 22:40:20
- * @git {@link https://github.com/dreamFlyingFlower}
- */
 @Slf4j
 @Aspect
 @RequiredArgsConstructor
 @EnableConfigurationProperties(LoggerProperties.class)
-public class OperationLogAspect {
+public class ControllerLogAspect {
 
-	private final LoggerProperties properties;
+	private final LoggerProperties loggerProperties;
 
 	private final OperationLogService operationLogService;
 
-	@Around("@annotation(logger)")
-	public Object around(ProceedingJoinPoint point, Logger logger) throws Throwable {
+	@Pointcut("within(@org.springframework.web.bind.annotation.RestController *) || within(@org.springframework.stereotype.Controller *)")
+	public void controllerPointcut() {
+	}
+
+	@Around("controllerPointcut()")
+	public Object logHttpRequest(ProceedingJoinPoint point) throws Throwable {
 		LocalDateTime requestTime = LocalDateTime.now();
 		Object result = null;
 		boolean success = false;
@@ -61,18 +58,18 @@ public class OperationLogAspect {
 			throw e;
 		} finally {
 			if (shouldLog(point)) {
-				saveLog(point, logger, result, success, errorMsg, requestTime, LocalDateTime.now());
+				saveLog(point, result, success, errorMsg, requestTime, LocalDateTime.now());
 			}
 		}
 	}
 
 	private boolean shouldLog(ProceedingJoinPoint point) {
 		String packageName = point.getTarget().getClass().getPackage().getName();
-		return properties.getScanPackages().stream().anyMatch(packageName::startsWith);
+		return loggerProperties.getScanPackages().stream().anyMatch(packageName::startsWith);
 	}
 
 	@Async("operationLogExecutor")
-	public void saveLog(ProceedingJoinPoint point, Logger logger, Object result, boolean success, String errorMsg,
+	public void saveLog(ProceedingJoinPoint point, Object result, boolean success, String errorMsg,
 			LocalDateTime requestTime, LocalDateTime responseTime) {
 		try {
 			HttpServletRequest request = WebHelpers.getRequest();
@@ -82,23 +79,26 @@ public class OperationLogAspect {
 
 			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(UUID.randomUUID().toString())
-					.appName(properties.getAppName())
-					.module(logger.value())
-					.operationType(logger.businessType().getMsg())
-					.operationDesc(logger.description())
+
+					.appName(loggerProperties.getAppName())
+					.module(point.getTarget().getClass().getName())
+					.operationType(signature.getMethod().getName())
+					.operationDesc(signature.getMethod().getName())
+
 					.methodName(signature.getMethod().getName())
 					.className(point.getTarget().getClass().getName())
 					.packageName(point.getTarget().getClass().getPackage().getName())
 
 					.clientIp(IpHelpers.getIp(request))
-					.requestBody(logger.saveRequest() ? JsonHelpers.toString(request.getParameterMap()) : null)
+					.requestBody(JsonHelpers.toString(request.getParameterMap()))
 					.requestHeaders(JsonHelpers.toString(WebHelpers.getHeaders(request)))
 					.requestMethod(request.getMethod())
-					.requestParams(logger.saveRequest() ? extractParams(point) : null)
+					.requestUrl(request.getRequestURI())
+					.requestParams(extractParams(point))
 					.requestTime(requestTime)
 					.requestUrl(request.getRequestURI())
 
-					.responseBody(logger.saveResponse() ? JsonHelpers.toString(result) : null)
+					.responseBody(JsonHelpers.toString(result))
 					.responseHeaders(JsonHelpers.toString(WebHelpers.getHeaders(response)))
 					.responseStatus(response.getStatus())
 					.responseTime(responseTime)
@@ -133,7 +133,6 @@ public class OperationLogAspect {
 		return JsonHelpers.toString(params);
 	}
 
-	// 这里需要根据实际项目获取当前用户信息
 	private String getCurrentUserId() {
 		return "system";
 	}

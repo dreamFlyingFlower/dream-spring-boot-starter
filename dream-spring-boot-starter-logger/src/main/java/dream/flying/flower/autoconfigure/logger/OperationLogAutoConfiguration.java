@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
+import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,7 @@ import dream.flying.flower.autoconfigure.logger.logbook.DatabaseSink;
 import dream.flying.flower.autoconfigure.logger.properties.LoggerProperties;
 import dream.flying.flower.autoconfigure.logger.service.OperationLogService;
 import dream.flying.flower.autoconfigure.logger.service.impl.OperationLogServiceImpl;
+import dream.flying.flower.framework.core.constant.ConstConfigPrefix;
 
 /**
  * 操作日志自动配置类 配置日志记录所需的各个组件 包括Logbook配置、异步配置、存储配置等
@@ -29,29 +32,32 @@ import dream.flying.flower.autoconfigure.logger.service.impl.OperationLogService
 @Configuration
 @AutoConfiguration
 @Import(AsyncConfig.class)
-@AutoConfigureBefore(LogbookAutoConfiguration.class)
-@EnableConfigurationProperties(LoggerProperties.class)
 @MapperScan("dream.flying.flower.autoconfigure.logger.mapper")
-@ConditionalOnProperty(prefix = "dream.logger", name = "enabled", havingValue = "true", matchIfMissing = true)
+@EnableConfigurationProperties({ LoggerProperties.class, FlywayProperties.class })
+@AutoConfigureBefore({ LogbookAutoConfiguration.class, FlywayAutoConfiguration.class })
+@ConditionalOnProperty(prefix = ConstConfigPrefix.AUTO_LOGGER, name = ConstConfigPrefix.ENABLED, havingValue = "true",
+		matchIfMissing = true)
 public class OperationLogAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(OperationLogService.class)
-	OperationLogService operationLogService() {
+	OperationLogService operationLogService(FlywayProperties flywayProperties) {
+		// 防止生产环境误操作清除所有表,必须设置为true
+		flywayProperties.setCleanDisabled(true);
+		// 首次迁移时基线化非空数据库
+		flywayProperties.setBaselineOnMigrate(true);
 		return new OperationLogServiceImpl();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(OperationLogAspect.class)
-	OperationLogAspect operationLogAspect(OperationLogService operationLogService, LoggerProperties properties) {
-		return new OperationLogAspect(operationLogService, properties);
+	OperationLogAspect operationLogAspect(LoggerProperties loggerProperties, OperationLogService operationLogService) {
+		return new OperationLogAspect(loggerProperties, operationLogService);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean(DatabaseSink.class)
-	@ConditionalOnProperty(prefix = "dream.logger", name = "http-log.enabled", havingValue = "true",
-			matchIfMissing = true)
-	Sink sink(OperationLogService operationLogService, LoggerProperties properties) {
-		return new DatabaseSink(operationLogService, properties);
+	Sink sink(LoggerProperties loggerProperties, OperationLogService operationLogService) {
+		return new DatabaseSink(loggerProperties, operationLogService);
 	}
 }

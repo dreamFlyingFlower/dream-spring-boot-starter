@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 import org.slf4j.MDC;
-import org.springframework.scheduling.annotation.Async;
 import org.zalando.logbook.Correlation;
 import org.zalando.logbook.HttpRequest;
 import org.zalando.logbook.HttpResponse;
@@ -31,9 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DatabaseSink implements Sink {
 
-	private final OperationLogService operationLogService;
+	private final LoggerProperties loggerProperties;
 
-	private final LoggerProperties properties;
+	private final OperationLogService operationLogService;
 
 	@Override
 	public void write(Precorrelation precorrelation, HttpRequest request) throws IOException {
@@ -55,7 +54,7 @@ public class DatabaseSink implements Sink {
 		try {
 			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(correlation.getId())
-					.appName(properties.getAppName())
+					.appName(loggerProperties.getAppName())
 					.requestTime(LocalDateTime.now())
 					.responseTime(LocalDateTime.now())
 					.costTime(correlation.getDuration().toMillis())
@@ -66,6 +65,7 @@ public class DatabaseSink implements Sink {
 					.responseStatus(response.getStatus())
 					.responseHeaders(JsonHelpers.toString(response.getHeaders()))
 					.responseBody(response.getBodyAsString())
+					.success(1)
 					.clientIp(getIp(request))
 					.createdTime(LocalDateTime.now())
 					.build();
