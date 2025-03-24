@@ -14,14 +14,10 @@
 	<name>dream-spring-boot-starter-logger</name>
 	<description>Starter project for log</description>
 
-	<properties>
-		<flyway.version>11.4.0</flyway.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-framework-mybatis-plus</artifactId>
+			<artifactId>dream-spring-boot-starter-mybatis-plus</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

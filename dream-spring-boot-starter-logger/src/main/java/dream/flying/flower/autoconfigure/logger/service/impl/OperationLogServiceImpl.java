@@ -1,7 +1,5 @@
 package dream.flying.flower.autoconfigure.logger.service.impl;
 
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import dream.flying.flower.autoconfigure.logger.entity.OperationLogEntity;
@@ -15,7 +13,6 @@ import lombok.RequiredArgsConstructor;
  * @author 飞花梦影
  * @date 2024-01-06 15:30:45
  */
-@Service
 @RequiredArgsConstructor
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLogEntity>
 		implements OperationLogService {

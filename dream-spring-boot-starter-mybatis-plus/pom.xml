@@ -10,26 +10,18 @@
 		<version>0.0.1</version>
 	</parent>
 
-	<artifactId>dream-spring-boot-starter-web</artifactId>
-	<name>dream-spring-boot-starter-web</name>
-	<description>Starter project for Web</description>
+	<artifactId>dream-spring-boot-starter-mybatis-plus</artifactId>
+	<name>dream-spring-boot-starter-mybatis-plus</name>
+	<description>Starter project for mybatis-plus</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>dream.flying.flower</groupId>
-			<artifactId>dream-framework-web</artifactId>
+			<artifactId>dream-framework-mybatis-plus</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jdk8</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-parameter-names</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-core</artifactId>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
 		</dependency>
 
 		<dependency>

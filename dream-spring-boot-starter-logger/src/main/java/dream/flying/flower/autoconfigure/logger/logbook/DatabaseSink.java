@@ -58,18 +58,18 @@ public class DatabaseSink implements Sink {
 					.requestTime(LocalDateTime.now())
 					.responseTime(LocalDateTime.now())
 					.costTime(correlation.getDuration().toMillis())
-					.requestMethod(request.getMethod())
-					.requestUrl(request.getPath())
-					.requestHeaders(JsonHelpers.toString(request.getHeaders()))
 					.requestBody(request.getBodyAsString())
-					.responseStatus(response.getStatus())
-					.responseHeaders(JsonHelpers.toString(response.getHeaders()))
+					.requestHeaders(JsonHelpers.toString(request.getHeaders()))
+					.requestMethod(request.getMethod())
+					.requestUrl(request.getRequestUri())
+
 					.responseBody(response.getBodyAsString())
+					.responseHeaders(JsonHelpers.toString(response.getHeaders()))
+					.responseStatus(response.getStatus())
 					.success(1)
 					.clientIp(getIp(request))
 					.createdTime(LocalDateTime.now())
 					.build();
-
 			operationLogService.save(operationLogEntity);
 		} catch (Exception e) {
 			log.error("Failed to save HTTP request log", e);

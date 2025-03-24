@@ -2,21 +2,25 @@ package dream.flying.flower.autoconfigure.logger;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration;
-import org.springframework.boot.autoconfigure.flyway.FlywayProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.logging.LogLevel;
+import org.springframework.boot.logging.LoggingSystem;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
+import org.zalando.logbook.DefaultHttpLogFormatter;
+import org.zalando.logbook.DefaultHttpLogWriter;
+import org.zalando.logbook.DefaultSink;
 import org.zalando.logbook.Sink;
 import org.zalando.logbook.autoconfigure.LogbookAutoConfiguration;
 
+import dream.flying.flower.autoconfigure.logger.aspect.ControllerLogAspect;
 import dream.flying.flower.autoconfigure.logger.aspect.OperationLogAspect;
 import dream.flying.flower.autoconfigure.logger.config.AsyncConfig;
-import dream.flying.flower.autoconfigure.logger.logbook.DatabaseSink;
+import dream.flying.flower.autoconfigure.logger.processor.FlywayPropertiesBeanProcessor;
 import dream.flying.flower.autoconfigure.logger.properties.LoggerProperties;
 import dream.flying.flower.autoconfigure.logger.service.OperationLogService;
 import dream.flying.flower.autoconfigure.logger.service.impl.OperationLogServiceImpl;
@@ -29,23 +33,17 @@ import dream.flying.flower.framework.core.constant.ConstConfigPrefix;
  * @date 2025-03-18 22:40:29
  * @git {@link https://github.com/dreamFlyingFlower}
  */
-@Configuration
-@AutoConfiguration
-@Import(AsyncConfig.class)
+@EnableConfigurationProperties({ LoggerProperties.class })
+@AutoConfiguration(before = { LogbookAutoConfiguration.class })
 @MapperScan("dream.flying.flower.autoconfigure.logger.mapper")
-@EnableConfigurationProperties({ LoggerProperties.class, FlywayProperties.class })
-@AutoConfigureBefore({ LogbookAutoConfiguration.class, FlywayAutoConfiguration.class })
+@Import({ AsyncConfig.class, FlywayPropertiesBeanProcessor.class })
 @ConditionalOnProperty(prefix = ConstConfigPrefix.AUTO_LOGGER, name = ConstConfigPrefix.ENABLED, havingValue = "true",
 		matchIfMissing = true)
 public class OperationLogAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean(OperationLogService.class)
-	OperationLogService operationLogService(FlywayProperties flywayProperties) {
-		// 防止生产环境误操作清除所有表,必须设置为true
-		flywayProperties.setCleanDisabled(true);
-		// 首次迁移时基线化非空数据库
-		flywayProperties.setBaselineOnMigrate(true);
+	OperationLogService operationLogService() {
 		return new OperationLogServiceImpl();
 	}
 
@@ -56,8 +54,19 @@ public class OperationLogAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean(DatabaseSink.class)
-	Sink sink(LoggerProperties loggerProperties, OperationLogService operationLogService) {
-		return new DatabaseSink(loggerProperties, operationLogService);
+	@ConditionalOnMissingBean(ControllerLogAspect.class)
+	ControllerLogAspect controllerLogAspect(LoggerProperties loggerProperties, OperationLogService operationLogService,
+			ApplicationContext applicationContext) {
+		return new ControllerLogAspect(loggerProperties, operationLogService, applicationContext);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean(Sink.class)
+	Sink sink(Environment environment, LoggingSystem loggingSystem) {
+		// 设置logbook日志级别
+		if (!environment.containsProperty("logging.level.org.zalando.logbook")) {
+			loggingSystem.setLogLevel("org.zalando.logbook", LogLevel.TRACE);
+		}
+		return new DefaultSink(new DefaultHttpLogFormatter(), new DefaultHttpLogWriter());
 	}
 }

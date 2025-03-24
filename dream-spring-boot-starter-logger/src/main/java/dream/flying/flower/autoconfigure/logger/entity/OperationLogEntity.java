@@ -49,7 +49,7 @@ public class OperationLogEntity {
 	private String className;
 
 	@TableField(condition = SqlCondition.LIKE)
-	private String packageName;
+	private String clientIp;
 
 	@TableField(condition = SqlCondition.LIKE)
 	private String requestUrl;
@@ -84,9 +84,6 @@ public class OperationLogEntity {
 
 	@TableField(condition = SqlCondition.LIKE)
 	private String errorMsg;
-
-	@TableField(condition = SqlCondition.LIKE)
-	private String clientIp;
 
 	private String userId;
 

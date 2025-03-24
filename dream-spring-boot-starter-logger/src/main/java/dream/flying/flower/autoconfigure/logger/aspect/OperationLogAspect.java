@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 操作日志切面类 实现AOP切面,拦截带有@Logger注解的方法 记录方法的调用信息,包括请求参数、响应结果、执行时间等
+ * 操作日志切面类.拦截带有Logger注解的方法,记录方法的调用信息,包括请求参数、响应结果、执行时间等
  *
  * @author 飞花梦影
  * @date 2025-03-18 22:40:20
@@ -60,26 +60,18 @@ public class OperationLogAspect {
 			errorMsg = e.getMessage();
 			throw e;
 		} finally {
-			if (shouldLog(point)) {
-				saveLog(point, logger, result, success, errorMsg, requestTime, LocalDateTime.now());
-			}
+			saveLog(point, logger, result, success, errorMsg, requestTime, LocalDateTime.now());
 		}
-	}
-
-	private boolean shouldLog(ProceedingJoinPoint point) {
-		String packageName = point.getTarget().getClass().getPackage().getName();
-		return properties.getScanPackages().stream().anyMatch(packageName::startsWith);
 	}
 
 	@Async("operationLogExecutor")
 	public void saveLog(ProceedingJoinPoint point, Logger logger, Object result, boolean success, String errorMsg,
 			LocalDateTime requestTime, LocalDateTime responseTime) {
+		HttpServletRequest request = WebHelpers.getRequest();
+		HttpServletResponse response = WebHelpers.getResponse();
+		MethodSignature signature = (MethodSignature) point.getSignature();
+
 		try {
-			HttpServletRequest request = WebHelpers.getRequest();
-			HttpServletResponse response = WebHelpers.getResponse();
-
-			MethodSignature signature = (MethodSignature) point.getSignature();
-
 			OperationLogEntity operationLogEntity = OperationLogEntity.builder()
 					.traceId(UUID.randomUUID().toString())
 					.appName(properties.getAppName())
@@ -88,7 +80,6 @@ public class OperationLogAspect {
 					.operationDesc(logger.description())
 					.methodName(signature.getMethod().getName())
 					.className(point.getTarget().getClass().getName())
-					.packageName(point.getTarget().getClass().getPackage().getName())
 
 					.clientIp(IpHelpers.getIp(request))
 					.requestBody(logger.saveRequest() ? JsonHelpers.toString(request.getParameterMap()) : null)
@@ -98,7 +89,6 @@ public class OperationLogAspect {
 					.requestTime(requestTime)
 					.requestUrl(request.getRequestURI())
 
-					.responseBody(logger.saveResponse() ? JsonHelpers.toString(result) : null)
 					.responseHeaders(JsonHelpers.toString(WebHelpers.getHeaders(response)))
 					.responseStatus(response.getStatus())
 					.responseTime(responseTime)
@@ -110,6 +100,12 @@ public class OperationLogAspect {
 					.username(getCurrentUsername())
 					.createdTime(LocalDateTime.now())
 					.build();
+
+			if (success) {
+				operationLogEntity.setResponseBody(logger.saveResponse() ? JsonHelpers.toString(result) : null);
+			} else {
+				operationLogEntity.setResponseBody(errorMsg);
+			}
 
 			operationLogService.save(operationLogEntity);
 		} catch (Exception e) {
