@@ -57,7 +57,7 @@ public class OperationLogAutoConfiguration {
 	@ConditionalOnMissingBean(ControllerLogAspect.class)
 	ControllerLogAspect controllerLogAspect(LoggerProperties loggerProperties, OperationLogService operationLogService,
 			ApplicationContext applicationContext) {
-		return new ControllerLogAspect(loggerProperties, operationLogService, applicationContext);
+		return new ControllerLogAspect(loggerProperties, applicationContext, operationLogService);
 	}
 
 	@Bean

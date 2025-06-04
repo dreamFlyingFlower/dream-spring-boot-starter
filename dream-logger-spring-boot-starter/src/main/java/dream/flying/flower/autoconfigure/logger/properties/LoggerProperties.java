@@ -1,10 +1,15 @@
 package dream.flying.flower.autoconfigure.logger.properties;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.web.multipart.MultipartFile;
 
 import dream.flying.flower.framework.core.constant.ConstConfigPrefix;
 import lombok.Data;
@@ -54,6 +59,22 @@ public class LoggerProperties {
 	 * 异步线程池队列容量
 	 */
 	private int asyncQueueCapacity = 1000;
+
+	/**
+	 * 日志标志字段
+	 */
+	private String logId = "LOG_ID";
+
+	/**
+	 * 不记录的方法参数类型
+	 */
+	private List<Class<?>> excludeParameterTypes =
+			new ArrayList<>(Arrays.asList(ServletRequest.class, ServletResponse.class, MultipartFile.class));
+
+	/**
+	 * 不记录的方法参数名
+	 */
+	private List<String> excludeParameterNames = new ArrayList<>(Arrays.asList("pwd", "password", "mobile", "idcard"));
 
 	/**
 	 * 过滤规则
