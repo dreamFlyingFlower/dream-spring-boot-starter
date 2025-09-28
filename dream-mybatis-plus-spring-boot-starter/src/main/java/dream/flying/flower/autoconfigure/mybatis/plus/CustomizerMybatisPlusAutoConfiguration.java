@@ -10,9 +10,11 @@ import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 
 import dream.flying.flower.autoconfigure.mybatis.plus.handler.DefaultMybatisPlusHandler;
+import dream.flying.flower.autoconfigure.mybatis.plus.interceptor.UniqueLogicDeleteInterceptor;
 import dream.flying.flower.autoconfigure.mybatis.plus.properties.DreamMybatisPlusProperties;
 
 /**
@@ -32,10 +34,12 @@ public class CustomizerMybatisPlusAutoConfiguration {
 		// 如果多数据源,此处不要指定,否则会影响分页
 		mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
 		// 乐观锁
-		// mybatisPlusInterceptor.addInnerInterceptor(new
-		// OptimisticLockerInnerInterceptor());
+		mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
 		// 防止全表更新与删除
 		mybatisPlusInterceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+
+		// 唯一字段删除逻辑,避免数据库索引重复
+		mybatisPlusInterceptor.addInnerInterceptor(new UniqueLogicDeleteInterceptor());
 		return mybatisPlusInterceptor;
 	}
 
