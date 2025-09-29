@@ -71,8 +71,8 @@ public abstract class MybatisPlusHandler implements MetaObjectHandler {
 		}
 		// 处理字段
 		Class<?> fieldTypeClass = metaObject.getGetterType(fieldName);
-		Object createTime = this.getFieldValByName(fieldName, metaObject);
-		if (Objects.isNull(createTime)) {
+		Object value = this.getFieldValByName(fieldName, metaObject);
+		if (Objects.isNull(value)) {
 			if (long.class == fieldTypeClass || Long.class == fieldTypeClass || int.class == fieldTypeClass
 					|| Integer.class == fieldTypeClass || short.class == fieldTypeClass || Short.class == fieldTypeClass
 					|| byte.class == fieldTypeClass || Byte.class == fieldTypeClass || double.class == fieldTypeClass

@@ -8,6 +8,7 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 
 import dream.flying.flower.db.annotation.Unique;
@@ -17,9 +18,8 @@ import dream.flying.flower.db.annotation.Unique;
  * 
  * 需要加入到MybatisPlusInterceptor中
  * 
- * 当前拦截器只能拦截根据ID删除的,不能拦截所有的
- * 
- * 要排除mybatis-plus自带的DefaultSqlInjector或重写DefaultSqlInjector#getMethodList,同时重写里面的
+ * 当前拦截器只能拦截根据ID删除的,不能拦截所有的.
+ * 要排除mybatis-plus自带的{@link DefaultSqlInjector}或重写{@link DefaultSqlInjector#getMethodList()},同时重写里面的
  * new Delete(), new DeleteByMap(), new DeleteById(), new DeleteBatchByIds(),
  *
  * @author 飞花梦影
