@@ -29,7 +29,7 @@ public class SecurityFailureHandler extends SimpleUrlAuthenticationFailureHandle
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException {
 		Result<?> result =
-				Result.builder().code(TipEnum.TIP_INTERNAL_UNAUTHORIZED.getCode()).msg(exception.getMessage()).build();
+				Result.builder().code(TipEnum.TIP_INTERNAL_UNAUTHORIZED.getValue()).msg(exception.getMessage()).build();
 		response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 		WebHelpers.write(response, result);
 	}
